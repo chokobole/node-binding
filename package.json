@@ -1,0 +1,29 @@
+{
+  "author": "Wonyong Kim(chokobole33@gmail.com)",
+  "bugs": {
+    "url": "https://github.com/chokobole/node-binding/issues"
+  },
+  "description": "A helper to bind nodejs using node-addon-api easily",
+  "main": "index.js",
+  "name": "node-binding",
+  "directories": {},
+  "homepage": "https://github.com/chokobole/node-binding#readme",
+  "keywords": [
+    "node-addon-api",
+    "c++",
+    "bindings"
+  ],
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chokobole/node-binding.git"
+  },
+  "scripts": {
+    "pretest": "node-gyp rebuild -C test",
+    "test": "node test"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "node-addon-api": "^2.0.0"
+  }
+}

@@ -1,0 +1,47 @@
+branches:
+  only:
+  - dev
+
+language: cpp
+matrix:
+  include:
+    - os: linux
+      dist: bionic
+      install:
+        - ./installers/install_bazel.sh
+        - ./installers/install_nodejs.sh && nvm alias default v12.14.0 && nvm use default
+      script:
+        - bazel build //examples:calculator_node && node examples/calculator.js
+      after_failure:
+        - find bazel-out/ -name "test.log" | xargs cat
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env:
+        - PYTHON2_BIN_PATH=/usr/local/bin/python
+        - PATH="/Users/travis/.pyenv:$PATH"
+      before_install:
+        - eval "$(pyenv init -)"
+      install:
+        - ./installers/install_bazel.sh
+        - ./installers/install_nodejs.sh && nvm alias default v12.14.0 && nvm use default
+      script:
+        - bazel build //examples:calculator_node && node examples/calculator.js
+      after_failure:
+        - find bazel-out/ -name "test.log" | xargs cat
+    - os: windows
+      env:
+        - PYTHON2_BIN_PATH=/c/ProgramData/chocolatey/bin/python.exe
+        - PATH="$PATH:/c/Program Files/nodejs:/c/Users/travis/AppData/Roaming/npm"
+      install:
+        - choco install bazel --version 1.2.0
+        - choco install nodejs.install --version 12.14.0
+      script:
+        - bazel build ///examples:calculator_node && node examples/calculator.js
+      after_failure:
+        - find bazel-out/ -name "test.log" | xargs cat
+
+notifications:
+    email:
+        on_success: always
+        on_failure: always

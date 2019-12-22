@@ -1,0 +1,32 @@
+.DS_Store
+.ipynb_checkpoints
+# IDE related
+.project
+.cproject
+.settings
+.vscode/
+*.swp
+*.sln
+*.vcxproj*
+.vs/
+
+# Build generated
+node_modules
+*.pyc
+__pycache__
+/bazel-*
+/.bazelrc.user
+BUILD
+WORKSPACE
+
+# Etc
+.clang-format
+.gitignore
+.npmignore
+.travis.yml
+bazel/
+examples/
+installers/
+third_party/
+test/
+
