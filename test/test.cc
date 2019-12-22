@@ -1,11 +1,9 @@
 #include "node_binding/typed_call.h"
 
-double CAdd(double arg0, double arg1) {
-  return arg0 + arg1;
-}
+double CAdd(double arg0, double arg1) { return arg0 + arg1; }
 
-Napi::Value Add(const Napi::CallbackInfo& info) {
-  return node_binding::TypedCall(info, &CAdd);
+Napi::Value Add(const Napi::CallbackInfo& info) {
+  return node_binding::TypedCall(info, & CAdd);
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
