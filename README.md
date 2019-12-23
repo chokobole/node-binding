@@ -80,3 +80,17 @@ Napi::Value Add(const Napi::CallbackInfo& info) {
   return node_binding::TypedCall(info, &CAdd);
 }
 ```
+
+### Default Arguments
+
+```c++
+double CAdd(double arg0, double arg1 = 1) { return arg0 + arg1; }
+
+Napi::Value Add(const Napi::CallbackInfo& info) {
+  if (info.Length() == 0) {
+    return node_binding::TypedCall(info, &CAdd, 1);
+  } else {
+    return node_binding::TypedCall(info, &CAdd);
+  }
+}
+```

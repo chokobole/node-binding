@@ -14,8 +14,8 @@ class Calculator {
   static int Sub(int a, int b) { return a - b; }
 
   int result() const { return result_; }
-  void AddInplace(int a) { result_ += a; }
-  void SubInplace(int a) { result_ -= a; }
+  void Increment(int a = 1) { result_ += a; }
+  void Decrement(int a = 1) { result_ -= a; }
   void Clear() { result_ = 0; }
 
  private:
@@ -39,12 +39,20 @@ class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
     return TypedCall(info, &Calculator::result, &calculator_);
   }
 
-  void AddInplace(const Napi::CallbackInfo& info) {
-    TypedCall(info, &Calculator::AddInplace, &calculator_);
+  void Increment(const Napi::CallbackInfo& info) {
+    if (info.Length() == 0) {
+      TypedCall(info, &Calculator::Increment, &calculator_, 1);
+    } else {
+      TypedCall(info, &Calculator::Increment, &calculator_);
+    }
   }
 
-  void SubInplace(const Napi::CallbackInfo& info) {
-    TypedCall(info, &Calculator::SubInplace, &calculator_);
+  void Decrement(const Napi::CallbackInfo& info) {
+    if (info.Length() == 0) {
+      TypedCall(info, &Calculator::Decrement, &calculator_, 1);
+    } else {
+      TypedCall(info, &Calculator::Decrement, &calculator_);
+    }
   }
 
   void Clear(const Napi::CallbackInfo& info) {
@@ -69,8 +77,8 @@ void CalculatorJs::Init(Napi::Env env, Napi::Object exports) {
                       StaticMethod("add", &CalculatorJs::Add),
                       StaticMethod("sub", &CalculatorJs::Sub),
                       InstanceMethod("result", &CalculatorJs::result),
-                      InstanceMethod("addInplace", &CalculatorJs::AddInplace),
-                      InstanceMethod("subInplace", &CalculatorJs::SubInplace),
+                      InstanceMethod("increment", &CalculatorJs::Increment),
+                      InstanceMethod("decrement", &CalculatorJs::Decrement),
                       InstanceMethod("clear", &CalculatorJs::Clear),
                   });
 

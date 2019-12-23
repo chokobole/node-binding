@@ -4,4 +4,6 @@
 
 const test = require("./build/Release/test.node");
 
+console.log(test.add());
+console.log(test.add(1));
 console.log(test.add(1, 2));
