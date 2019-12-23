@@ -9,6 +9,8 @@ config_setting(
 cc_library(
     name = "node_binding",
     hdrs = [
+        "node_binding/constructor.h",
+        "node_binding/macros.h",
         "node_binding/template_util.h",
         "node_binding/type_convertor.h",
         "node_binding/typed_call.h",

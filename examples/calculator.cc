@@ -2,14 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <iostream>
+#include <memory>
 
+#include "node_binding/constructor.h"
 #include "node_binding/typed_call.h"
 
 namespace node_binding {
 
 class Calculator {
  public:
+  Calculator() : result_(0) {}
+  explicit Calculator(int result) : result_(result) {}
+
   static int Add(int a, int b) { return a + b; }
   static int Sub(int a, int b) { return a - b; }
 
@@ -19,7 +23,7 @@ class Calculator {
   void Clear() { result_ = 0; }
 
  private:
-  int result_ = 0;
+  int result_;
 };
 
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
@@ -36,33 +40,33 @@ class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
   }
 
   Napi::Value result(const Napi::CallbackInfo& info) {
-    return TypedCall(info, &Calculator::result, &calculator_);
+    return TypedCall(info, &Calculator::result, calculator_.get());
   }
 
   void Increment(const Napi::CallbackInfo& info) {
     if (info.Length() == 0) {
-      TypedCall(info, &Calculator::Increment, &calculator_, 1);
+      TypedCall(info, &Calculator::Increment, calculator_.get(), 1);
     } else {
-      TypedCall(info, &Calculator::Increment, &calculator_);
+      TypedCall(info, &Calculator::Increment, calculator_.get());
     }
   }
 
   void Decrement(const Napi::CallbackInfo& info) {
     if (info.Length() == 0) {
-      TypedCall(info, &Calculator::Decrement, &calculator_, 1);
+      TypedCall(info, &Calculator::Decrement, calculator_.get(), 1);
     } else {
-      TypedCall(info, &Calculator::Decrement, &calculator_);
+      TypedCall(info, &Calculator::Decrement, calculator_.get());
     }
   }
 
   void Clear(const Napi::CallbackInfo& info) {
-    TypedCall(info, &Calculator::Clear, &calculator_);
+    TypedCall(info, &Calculator::Clear, calculator_.get());
   }
 
  private:
   static Napi::FunctionReference constructor_;
 
-  Calculator calculator_;
+  std::unique_ptr<Calculator> calculator_;
 };
 
 Napi::FunctionReference CalculatorJs::constructor_;
@@ -89,7 +93,18 @@ void CalculatorJs::Init(Napi::Env env, Napi::Object exports) {
 }
 
 CalculatorJs::CalculatorJs(const Napi::CallbackInfo& info)
-    : Napi::ObjectWrap<CalculatorJs>(info) {}
+    : Napi::ObjectWrap<CalculatorJs>(info) {
+  if (info.Length() == 0) {
+    calculator_ = std::unique_ptr<Calculator>(
+        TypedConstruct(info, &Constructor<Calculator>::CallNew<>));
+  } else if (info.Length() == 1) {
+    calculator_ = std::unique_ptr<Calculator>(
+        TypedConstruct(info, &Constructor<Calculator>::CallNew<int>));
+  } else {
+    Napi::Env env = info.Env();
+    THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
+  }
+}
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   CalculatorJs::Init(env, exports);

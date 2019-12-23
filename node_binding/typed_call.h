@@ -7,6 +7,7 @@
 
 #include "napi.h"
 
+#include "node_binding/macros.h"
 #include "node_binding/template_util.h"
 #include "node_binding/type_convertor.h"
 
@@ -31,9 +32,6 @@ template <typename T,
 Napi::String ToJs(Napi::Env env, const T& value) {
   return Napi::String::New(env, value);
 }
-
-#define ARG(N) \
-  TypeConvertor<internal::PickTypeListItem<N, ArgList>>::ToNativeValue(info[N])
 
 template <size_t N, typename R, typename... Args, typename... DefaultArgs,
           std::enable_if_t<0 == N>* = nullptr>
@@ -468,13 +466,6 @@ R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
 }
 
 }  // namespace internal
-
-#define THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env)          \
-  Napi::TypeError::New(env, "Wrong number of arguments") \
-      .ThrowAsJavaScriptException()
-
-#define JS_CHECK_NUM_ARGS(env, num_args) \
-  if (info.Length() != num_args) THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env)
 
 template <typename R, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),

@@ -11,3 +11,5 @@ console.log(`${c.result()} + 1 = ${c.increment(), c.result()}`);
 console.log(`${c.result()} + 3 = ${c.increment(3), c.result()}`);
 console.log(`${c.result()} - 1 = ${c.decrement(), c.result()}`);
 console.log(`${c.result()} - 5 = ${c.decrement(5), c.result()}`);
+const d = new calculator.Calculator(5);
+console.log(`${d.result()} + 1 = ${d.increment(), d.result()}`);
