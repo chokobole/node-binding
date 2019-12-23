@@ -7,7 +7,7 @@ This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github
 ### bazel
 
 ```python
-load("@github_chokobole_node_binding//bazel:node_binding.bzl", "node_binding")
+load("@com_github_chokobole_node_binding//bazel:node_binding.bzl", "node_binding")
 
 node_binding(
     name = "...",
@@ -23,7 +23,7 @@ node_binding(
         ],
     }),
     deps = [
-        "@github_chokobole_node_binding//:node_binding",
+        "@com_github_chokobole_node_binding//:node_binding",
     ],
 )
 ```

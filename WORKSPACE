@@ -1,4 +1,4 @@
-workspace(name = "github_chokobole_node_binding")
+workspace(name = "com_github_chokobole_node_binding")
 
 load("//bazel:node_binding_deps.bzl", "node_binding_deps")
 
