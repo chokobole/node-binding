@@ -12,19 +12,19 @@ namespace node_binding {
 template <typename Class>
 struct Constructor {
   template <typename... Args>
-  static Class Call(Args... args) {
+  static Class Call(Args&&... args) {
     return Class(std::forward<Args>(args)...);
   };
 
   template <typename... Args>
-  static Class* CallNew(Args... args) {
+  static Class* CallNew(Args&&... args) {
     return new Class(std::forward<Args>(args)...);
   };
 };
 
 template <typename R, typename... Args, typename... DefaultArgs>
 R TypedConstruct(const Napi::CallbackInfo& info, R (*f)(Args...),
-                 DefaultArgs... def_args) {
+                 DefaultArgs&&... def_args) {
   Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
