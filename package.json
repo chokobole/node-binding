@@ -22,7 +22,7 @@
     "pretest": "node-gyp rebuild -C test",
     "test": "node test"
   },
-  "version": "1.1.0",
+  "version": "1.1.1",
   "dependencies": {
     "node-addon-api": "^2.0.0"
   }
