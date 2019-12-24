@@ -90,6 +90,8 @@ class Calculator {
   int result_;
 };
 
+namespace node_binding {
+
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  public:
   void Increment(const Napi::CallbackInfo& info) {
@@ -100,6 +102,8 @@ class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
     }
   }
 };
+
+}  // namespace node_binding
 ```
 
 ### Constructor
@@ -117,6 +121,8 @@ class Calculator {
  private:
   int result_;
 };
+
+namespace node_binding {
 
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  public:
@@ -137,6 +143,8 @@ class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  private:
   std::unique_ptr<Calculator> calculator_;
 };
+
+}  // namespace node_binding
 ```
 
 ### InstanceAccessor
@@ -150,6 +158,8 @@ struct Point {
 
   Point(int x = 0, int y = 0) : x(x), y(y) {}
 };
+
+namespace node_binding {
 
 class PointJs : public Napi::ObjectWrap<PointJs> {
  public:
@@ -172,4 +182,6 @@ class PointJs : public Napi::ObjectWrap<PointJs> {
  private:
   Point point_;
 };
+
+}  // namespace node_binding
 ```
