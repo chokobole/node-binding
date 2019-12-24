@@ -8,20 +8,14 @@ This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github
 
 ```python
 load("@com_github_chokobole_node_binding//bazel:node_binding.bzl", "node_binding")
+load("@com_github_chokobole_node_binding//bazel:node_binding_cc.bzl", "node_binding_copts")
 
 node_binding(
     name = "...",
     srcs = [
       ...
     ],
-    copts = select({
-        "//:windows": [
-            "/std:c++14",
-        ],
-        "//conditions:default": [
-            "-std=c++14",
-        ],
-    }),
+    copts = node_binding_copts(),
     deps = [
         "@com_github_chokobole_node_binding//:node_binding",
     ],
@@ -29,6 +23,8 @@ node_binding(
 ```
 
 ### node-gyp
+
+Follow [examples](https://github.com/nodejs/node-addon-examples)! But in `include_dirs`, fill like below.
 
 ```python
 {
@@ -81,16 +77,99 @@ Napi::Value Add(const Napi::CallbackInfo& info) {
 }
 ```
 
-### Default Arguments
+### InstanceMethod / StaticMethod with Default Arguments
+
+You can find full code at [examples/calculator.cc](examples/calculator.cc).
 
 ```c++
-double CAdd(double arg0, double arg1 = 1) { return arg0 + arg1; }
+class Calculator {
+ public:
+  void Increment(int a = 1) { result_ += a; }
 
-Napi::Value Add(const Napi::CallbackInfo& info) {
-  if (info.Length() == 0) {
-    return node_binding::TypedCall(info, &CAdd, 1);
-  } else {
-    return node_binding::TypedCall(info, &CAdd);
+ private:
+  int result_;
+};
+
+class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
+ public:
+  void Increment(const Napi::CallbackInfo& info) {
+    if (info.Length() == 0) {
+      TypedCall(info, &Calculator::Increment, calculator_.get(), 1);
+    } else {
+      TypedCall(info, &Calculator::Increment, calculator_.get());
+    }
   }
-}
+};
+```
+
+### Constructor
+
+You can find full code at [examples/calculator.cc](examples/calculator.cc).
+
+`Constructor<Class>::CallNew<Args>` calls `new Class(Args)`, whereas, `Constructor<Class>::Calls<Args>` calls `Class(Args)`.
+
+```c++
+class Calculator {
+ public:
+  Calculator() : result_(0) {}
+  explicit Calculator(int result) : result_(result) {}
+
+ private:
+  int result_;
+};
+
+class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
+ public:
+  CalculatorJs(const Napi::CallbackInfo& info)
+    : Napi::ObjectWrap<CalculatorJs>(info) {
+    if (info.Length() == 0) {
+      calculator_ = std::unique_ptr<Calculator>(
+          TypedConstruct(info, &Constructor<Calculator>::CallNew<>));
+    } else if (info.Length() == 1) {
+      calculator_ = std::unique_ptr<Calculator>(
+          TypedConstruct(info, &Constructor<Calculator>::CallNew<int>));
+    } else {
+      Napi::Env env = info.Env();
+      THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
+    }
+  }
+
+ private:
+  std::unique_ptr<Calculator> calculator_;
+};
+```
+
+### InstanceAccessor
+
+You can find full code at [examples/point.cc](examples/point.cc).
+
+```c++
+struct Point {
+  int x;
+  int y;
+
+  Point(int x = 0, int y = 0) : x(x), y(y) {}
+};
+
+class PointJs : public Napi::ObjectWrap<PointJs> {
+ public:
+  void SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
+    point_.x = ToNativeValue<int>(v);
+  }
+
+  void SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
+    point_.y = ToNativeValue<int>(v);
+  }
+
+  Napi::Value GetX(const Napi::CallbackInfo& info) {
+    return ToJSValue(info, point_.x);
+  }
+
+  Napi::Value GetY(const Napi::CallbackInfo& info) {
+    return ToJSValue(info, point_.y);
+  }
+
+ private:
+  Point point_;
+};
 ```

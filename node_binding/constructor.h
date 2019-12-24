@@ -25,9 +25,8 @@ struct Constructor {
 template <typename R, typename... Args, typename... DefaultArgs>
 R TypedConstruct(const Napi::CallbackInfo& info, R (*f)(Args...),
                  DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   return internal::Invoke<num_args>(info, f,
                                     std::forward<DefaultArgs>(def_args)...);

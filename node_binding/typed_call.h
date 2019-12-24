@@ -452,20 +452,18 @@ R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
 template <typename R, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),
                       DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
-  return ToJSValue(env, internal::Invoke<num_args>(
-                            info, f, std::forward<DefaultArgs>(def_args)...));
+  return ToJSValue(info, internal::Invoke<num_args>(
+                             info, f, std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (*f)(Args...),
                DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   internal::Invoke<num_args>(info, f, std::forward<DefaultArgs>(def_args)...);
 }
@@ -473,21 +471,19 @@ void TypedCall(const Napi::CallbackInfo& info, void (*f)(Args...),
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...),
                       Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   return ToJSValue(
-      env, internal::Invoke<num_args>(info, f, c,
-                                      std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke<num_args>(info, f, c,
+                                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...),
                Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -497,21 +493,19 @@ template <typename R, typename Class, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       R (Class::*f)(Args...) const, const Class* c,
                       DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   return ToJSValue(
-      env, internal::Invoke<num_args>(info, f, c,
-                                      std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke<num_args>(info, f, c,
+                                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const,
                const Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -521,21 +515,19 @@ template <typename R, typename Class, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       R (Class::*f)(Args...) const&, const Class* c,
                       DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   return ToJSValue(
-      env, internal::Invoke<num_args>(info, f, c,
-                                      std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke<num_args>(info, f, c,
+                                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const&,
                const Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -544,21 +536,19 @@ void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const&,
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&,
                       Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   return ToJSValue(
-      env, internal::Invoke<num_args>(info, f, c,
-                                      std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke<num_args>(info, f, c,
+                                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) &&,
                Class* c, DefaultArgs&&... def_args) {
-  Napi::Env env = info.Env();
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
-  JS_CHECK_NUM_ARGS(env, num_args);
+  JS_CHECK_NUM_ARGS(info, num_args);
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);

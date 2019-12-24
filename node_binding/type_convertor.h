@@ -21,8 +21,8 @@ class TypeConvertor<bool> {
     return value.As<Napi::Boolean>().Value();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, bool value) {
-    return Napi::Boolean::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, bool value) {
+    return Napi::Boolean::New(info.Env(), value);
   }
 };
 
@@ -32,11 +32,11 @@ class TypeConvertor<T, std::enable_if_t<std::is_integral<T>::value &&
                                         sizeof(T) <= sizeof(int32_t)>> {
  public:
   static T ToNativeValue(const Napi::Value& value) {
-    return value.As<Napi::Number>().Int32Value();
+    return static_cast<T>(value.As<Napi::Number>().Int32Value());
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, T value) {
-    return Napi::Number::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
+    return Napi::Number::New(info.Env(), value);
   }
 };
 
@@ -50,8 +50,8 @@ class TypeConvertor<
     return value.As<Napi::Number>().Uint32Value();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, T value) {
-    return Napi::Number::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
+    return Napi::Number::New(info.Env(), value);
   }
 };
 
@@ -66,11 +66,11 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<int64_t, T>::value>> {
 #endif
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, int64_t value) {
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, int64_t value) {
 #ifdef NAPI_EXPERIMENTAL
-    return Napi::BigInt::New(env, value);
+    return Napi::BigInt::New(info.Env(), value);
 #else
-    return Napi::Number::New(env, value);
+    return Napi::Number::New(info.Env(), value);
 #endif
   }
 };
@@ -86,11 +86,11 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
 #endif
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, uint64_t value) {
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, uint64_t value) {
 #ifdef NAPI_EXPERIMENTAL
-    return Napi::BigInt::New(env, value);
+    return Napi::BigInt::New(info.Env(), value);
 #else
-    return Napi::Number::New(env, value);
+    return Napi::Number::New(info.Env(), value);
 #endif
   }
 };
@@ -102,8 +102,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
     return value.As<Napi::Number>().FloatValue();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, float value) {
-    return Napi::Number::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, float value) {
+    return Napi::Number::New(info.Env(), value);
   }
 };
 
@@ -114,8 +114,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<double, T>::value>> {
     return value.As<Napi::Number>().DoubleValue();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, double value) {
-    return Napi::Number::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, double value) {
+    return Napi::Number::New(info.Env(), value);
   }
 };
 
@@ -126,8 +126,9 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<std::string, T>::value>> {
     return value.As<Napi::String>().Utf8Value();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, const std::string& value) {
-    return Napi::String::New(env, value);
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
+                               const std::string& value) {
+    return Napi::String::New(info.Env(), value);
   }
 };
 
@@ -138,8 +139,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
     return TypeConvertor<std::underlying_type_t<T>>::ToNativeValue();
   }
 
-  static Napi::Value ToJSValue(Napi::Env env, T value) {
-    return Napi::Number::New(env,
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
+    return Napi::Number::New(info.Env(),
                              static_cast<std::underlying_type_t<T>>(value));
   }
 };
@@ -150,8 +151,9 @@ auto ToNativeValue(const Napi::Value& value) {
 }
 
 template <typename T>
-Napi::Value ToJSValue(Napi::Env env, T&& value) {
-  return TypeConvertor<std::decay_t<T>>::ToJSValue(env, std::forward<T>(value));
+Napi::Value ToJSValue(const Napi::CallbackInfo& info, T&& value) {
+  return TypeConvertor<std::decay_t<T>>::ToJSValue(info,
+                                                   std::forward<T>(value));
 }
 
 }  // namespace node_binding

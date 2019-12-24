@@ -2,29 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "examples/calculator.h"
+
 #include <memory>
 
 #include "node_binding/constructor.h"
 #include "node_binding/typed_call.h"
 
 namespace node_binding {
-
-class Calculator {
- public:
-  Calculator() : result_(0) {}
-  explicit Calculator(int result) : result_(result) {}
-
-  static int Add(int a, int b) { return a + b; }
-  static int Sub(int a, int b) { return a - b; }
-
-  int result() const { return result_; }
-  void Increment(int a = 1) { result_ += a; }
-  void Decrement(int a = 1) { result_ -= a; }
-  void Clear() { result_ = 0; }
-
- private:
-  int result_;
-};
 
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  public:

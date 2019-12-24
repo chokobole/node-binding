@@ -14,7 +14,8 @@
   ::Napi::TypeError::New(env, "Wrong number of arguments") \
       .ThrowAsJavaScriptException()
 
-#define JS_CHECK_NUM_ARGS(env, num_args) \
+#define JS_CHECK_NUM_ARGS(info, num_args) \
+  ::Napi::Env env = info.Env();           \
   if (info.Length() != num_args) THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env)
 
 #define ARG(N)                                                              \
