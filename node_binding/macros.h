@@ -10,8 +10,6 @@
 #include "node_binding/template_util.h"
 #include "node_binding/type_convertor.h"
 
-namespace node_binding {
-
 #define THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env)            \
   ::Napi::TypeError::New(env, "Wrong number of arguments") \
       .ThrowAsJavaScriptException()
@@ -19,9 +17,8 @@ namespace node_binding {
 #define JS_CHECK_NUM_ARGS(env, num_args) \
   if (info.Length() != num_args) THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env)
 
-#define ARG(N) \
-  TypeConvertor<internal::PickTypeListItem<N, ArgList>>::ToNativeValue(info[N])
-
-}  // namespace node_binding
+#define ARG(N)                                                              \
+  ::node_binding::TypeConvertor<::node_binding::internal::PickTypeListItem< \
+      N, ArgList>>::ToNativeValue(info[N])
 
 #endif  // NODE_BINDING_MACROS_H_
