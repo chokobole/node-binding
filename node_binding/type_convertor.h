@@ -17,7 +17,7 @@ class TypeConvertor;
 template <>
 class TypeConvertor<bool> {
  public:
-  static bool ToNativeValue(Napi::Value value) {
+  static bool ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Boolean>().Value();
   }
 
@@ -31,7 +31,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_integral<T>::value &&
                                         std::is_signed<T>::value &&
                                         sizeof(T) <= sizeof(int32_t)>> {
  public:
-  static T ToNativeValue(Napi::Value value) {
+  static T ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Number>().Int32Value();
   }
 
@@ -46,7 +46,7 @@ class TypeConvertor<
            std::is_integral<T>::value && !std::is_same<bool, T>::value &&
            !std::is_signed<T>::value && sizeof(T) <= sizeof(int32_t)>> {
  public:
-  static T ToNativeValue(Napi::Value value) {
+  static T ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Number>().Uint32Value();
   }
 
@@ -58,7 +58,7 @@ class TypeConvertor<
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<int64_t, T>::value>> {
  public:
-  static int64_t ToNativeValue(Napi::Value value) {
+  static int64_t ToNativeValue(const Napi::Value& value) {
 #ifdef NAPI_EXPERIMENTAL
     return value.As<Napi::BigInt>().Int64Value();
 #else
@@ -78,7 +78,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<int64_t, T>::value>> {
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
  public:
-  static uint64_t ToNativeValue(Napi::Value value) {
+  static uint64_t ToNativeValue(const Napi::Value& value) {
 #ifdef NAPI_EXPERIMENTAL
     return value.As<Napi::BigInt>().Uint64Value();
 #else
@@ -98,7 +98,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
  public:
-  static float ToNativeValue(Napi::Value value) {
+  static float ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Number>().FloatValue();
   }
 
@@ -110,7 +110,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<double, T>::value>> {
  public:
-  static double ToNativeValue(Napi::Value value) {
+  static double ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Number>().DoubleValue();
   }
 
@@ -122,7 +122,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<double, T>::value>> {
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<std::string, T>::value>> {
  public:
-  static std::string ToNativeValue(Napi::Value value) {
+  static std::string ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::String>().Utf8Value();
   }
 
@@ -134,7 +134,7 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<std::string, T>::value>> {
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
  public:
-  static std::underlying_type_t<T> ToNativeValue(Napi::Value value) {
+  static std::underlying_type_t<T> ToNativeValue(const Napi::Value& value) {
     return TypeConvertor<std::underlying_type_t<T>>::ToNativeValue();
   }
 
