@@ -15,24 +15,6 @@ namespace node_binding {
 
 namespace internal {
 
-template <typename T, std::enable_if_t<std::is_same<bool, T>::value>* = nullptr>
-Napi::Boolean ToJs(Napi::Env env, T value) {
-  return Napi::Boolean::New(env, value);
-}
-
-template <typename T,
-          std::enable_if_t<std::is_arithmetic<T>::value &&
-                           !std::is_same<bool, T>::value>* = nullptr>
-Napi::Number ToJs(Napi::Env env, T value) {
-  return Napi::Number::New(env, value);
-}
-
-template <typename T,
-          std::enable_if_t<std::is_same<std::string, T>::value>* = nullptr>
-Napi::String ToJs(Napi::Env env, const T& value) {
-  return Napi::String::New(env, value);
-}
-
 template <size_t N, typename R, typename... Args, typename... DefaultArgs,
           std::enable_if_t<0 == N>* = nullptr>
 R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
@@ -474,9 +456,8 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
 
-  return TypeConvertor<std::decay_t<R>>::ToJSValue(
-      env, internal::Invoke<num_args>(info, f,
-                                      std::forward<DefaultArgs>(def_args)...));
+  return ToJSValue(env, internal::Invoke<num_args>(
+                            info, f, std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename... Args, typename... DefaultArgs>
@@ -496,7 +477,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...),
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
 
-  return TypeConvertor<std::decay_t<R>>::ToJSValue(
+  return ToJSValue(
       env, internal::Invoke<num_args>(info, f, c,
                                       std::forward<DefaultArgs>(def_args)...));
 }
@@ -520,7 +501,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
 
-  return TypeConvertor<std::decay_t<R>>::ToJSValue(
+  return ToJSValue(
       env, internal::Invoke<num_args>(info, f, c,
                                       std::forward<DefaultArgs>(def_args)...));
 }
@@ -544,7 +525,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
 
-  return TypeConvertor<std::decay_t<R>>::ToJSValue(
+  return ToJSValue(
       env, internal::Invoke<num_args>(info, f, c,
                                       std::forward<DefaultArgs>(def_args)...));
 }
@@ -567,7 +548,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&,
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(env, num_args);
 
-  return TypeConvertor<std::decay_t<R>>::ToJSValue(
+  return ToJSValue(
       env, internal::Invoke<num_args>(info, f, c,
                                       std::forward<DefaultArgs>(def_args)...));
 }

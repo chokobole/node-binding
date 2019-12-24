@@ -144,6 +144,16 @@ class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
   }
 };
 
+template <typename T>
+auto ToNativeValue(const Napi::Value& value) {
+  return TypeConvertor<T>::ToNativeValue(value);
+}
+
+template <typename T>
+Napi::Value ToJSValue(Napi::Env env, T&& value) {
+  return TypeConvertor<std::decay_t<T>>::ToJSValue(env, std::forward<T>(value));
+}
+
 }  // namespace node_binding
 
 #endif  // NODE_BINDING_TYPE_CONVERTOR_H_
