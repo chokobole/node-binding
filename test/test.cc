@@ -13,7 +13,6 @@ Napi::Value Add(const Napi::CallbackInfo& info) {
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  Napi::HandleScope scope(env);
   exports.Set("add", Napi::Function::New(env, Add));
   return exports;
 }
