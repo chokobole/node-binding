@@ -2,12 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "examples/point.h"
+#include "point.h"
 
 #include "node_binding/constructor.h"
 #include "node_binding/typed_call.h"
-
-namespace node_binding {
 
 class PointJs : public Napi::ObjectWrap<PointJs> {
  public:
@@ -15,19 +13,19 @@ class PointJs : public Napi::ObjectWrap<PointJs> {
   PointJs(const Napi::CallbackInfo& info);
 
   void SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.x = ToNativeValue<int>(v);
+    point_.x = node_binding::ToNativeValue<int>(v);
   }
 
   void SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.y = ToNativeValue<int>(v);
+    point_.y = node_binding::ToNativeValue<int>(v);
   }
 
   Napi::Value GetX(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.x);
+    return node_binding::ToJSValue(info, point_.x);
   }
 
   Napi::Value GetY(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.y);
+    return node_binding::ToJSValue(info, point_.y);
   }
 
  private:
@@ -40,8 +38,6 @@ Napi::FunctionReference PointJs::constructor_;
 
 // static
 void PointJs::Init(Napi::Env env, Napi::Object exports) {
-  Napi::HandleScope scope(env);
-
   Napi::Function func =
       DefineClass(env, "Point",
                   {
@@ -58,11 +54,11 @@ void PointJs::Init(Napi::Env env, Napi::Object exports) {
 PointJs::PointJs(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<PointJs>(info) {
   if (info.Length() == 0) {
-    point_ = TypedConstruct(info, &Constructor<Point>::Call<int, int>, 0, 0);
-  } else if (info.Length() == 1) {
-    point_ = TypedConstruct(info, &Constructor<Point>::Call<int, int>, 0);
+    point_ = node_binding::TypedConstruct(
+        info, &node_binding::Constructor<Point>::Call<>);
   } else if (info.Length() == 2) {
-    point_ = TypedConstruct(info, &Constructor<Point>::Call<int, int>);
+    point_ = node_binding::TypedConstruct(
+        info, &node_binding::Constructor<Point>::Call<int, int>);
   } else {
     Napi::Env env = info.Env();
     THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
@@ -75,6 +71,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-NODE_API_MODULE(point, Init)
-
-}  // namespace node_binding
+NODE_API_MODULE(3_instance_accessor, Init)

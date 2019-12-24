@@ -2,8 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-const test = require("./build/Release/test.node");
+#pragma once
 
-console.log(test.add());
-console.log(test.add(1));
-console.log(test.add(1, 2));
+struct Point {
+  int x;
+  int y;
+
+  Point() : x(0), y(0) {}
+  Point(int x, int y) : x(x), y(y) {}
+};

@@ -19,11 +19,14 @@
     "url": "git+https://github.com/chokobole/node-binding.git"
   },
   "scripts": {
-    "pretest": "node-gyp rebuild -C test",
-    "test": "node test"
+    "pretest": "./test/build_all.sh",
+    "test": "mocha"
   },
   "version": "1.1.1",
   "dependencies": {
     "node-addon-api": "^2.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.2"
   }
 }

@@ -1,3 +1,7 @@
+// Copyright (c) 2019 The NodeBinding Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "node_binding/typed_call.h"
 
 double CAdd(double arg0 = 1, double arg1 = 2) { return arg0 + arg1; }
@@ -17,4 +21,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-NODE_API_MODULE(test, Init)
+NODE_API_MODULE(1_default_argument, Init)
