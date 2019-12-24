@@ -40,8 +40,6 @@ Napi::FunctionReference PointJs::constructor_;
 
 // static
 void PointJs::Init(Napi::Env env, Napi::Object exports) {
-  Napi::HandleScope scope(env);
-
   Napi::Function func =
       DefineClass(env, "Point",
                   {
