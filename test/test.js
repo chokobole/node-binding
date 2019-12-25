@@ -9,6 +9,7 @@ const test1 =
 const test2 = require('./2_constructor/build/Release/2_constructor.node');
 const test3 =
     require('./3_instance_accessor/build/Release/3_instance_accessor.node');
+const test4 = require('./4_stl/build/Release/4_stl.node');
 
 describe('0_function', () => {
   it('add(int arg0, int arg1) bind', () => {
@@ -35,9 +36,9 @@ describe('1_default_argument', () => {
 
 describe('2_constructor', () => {
   it('Point(int x = 0, int y = 0) bind', () => {
-    new test2.Point();
-    new test2.Point(1);
-    new test2.Point(1, 2);
+    assert.doesNotThrow(() => new test2.Point());
+    assert.doesNotThrow(() => new test2.Point(1));
+    assert.doesNotThrow(() => new test2.Point(1, 2));
     assert.throws(() => {
       new test2.Point(1, 2, 3);
     });
@@ -54,5 +55,12 @@ describe('3_instance_accessor', () => {
     const p2 = new test3.Point(1, 2);
     assert.equal(p2.x, 1);
     assert.equal(p2.y, 2);
+  });
+});
+
+describe('4_stl', () => {
+  it('std::vector<int> bind', () => {
+    assert.equal(test4.sum([1, 2, 3]), 6);
+    assert.deepEqual(test4.linSpace(1, 5, 1), [1, 2, 3, 4]);
   });
 });

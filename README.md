@@ -13,6 +13,7 @@ This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github
     - [InstanceMethod with default arguments](#instancemethod-with-default-arguments)
     - [Constructor](#constructor)
     - [InstanceAccessor](#instanceaccessor)
+    - [STL containers](#stl-containers)
 
 ## Overview
 
@@ -231,4 +232,32 @@ class PointJs : public Napi::ObjectWrap<PointJs> {
 };
 
 }  // namespace node_binding
+```
+
+### STL containers
+
+You can find full code at [test/4_stl/addon.cc](test/4_stl/addon.cc). To bind `std::vector<T>`, you have to include `#include "node_binding/stl.h"`.
+
+```c++
+int Sum(const std::vector<int>& vec) {
+  int ret = 0;
+  for (int v: vec) {
+    ret += v;
+  }
+  return ret;
+}
+
+std::vector<int> LinSpace(int from, int to, int step) {
+  std::vector<int> ret;
+  for (int i = from ;i < to; i += step) {
+    ret.push_back(i);
+  }
+  return ret;
+}
+
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("sum", Napi::Function::New(env, Sum));
+  exports.Set("linSpace", Napi::Function::New(env, LinSpace));
+  return exports;
+}
 ```

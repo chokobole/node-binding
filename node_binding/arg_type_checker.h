@@ -26,7 +26,7 @@ struct ArgTypeChecker<T, Rest...> {
   static void Check(const Napi::CallbackInfo& info, size_t i, size_t n) {
     if (i == n) return;
 
-    if (TypeConvertor<T>::IsConvertible(info[i])) {
+    if (TypeConvertor<std::decay_t<T>>::IsConvertible(info[i])) {
       return ArgTypeChecker<Rest...>::Check(info, i + 1, n);
     } else {
       std::stringstream ss;
