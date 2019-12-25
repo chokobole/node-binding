@@ -6,7 +6,6 @@
 #define NODE_BINDING_TYPED_CALL_H_
 
 #include "napi.h"
-
 #include "node_binding/macros.h"
 #include "node_binding/template_util.h"
 #include "node_binding/type_convertor.h"
@@ -454,6 +453,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),
                       DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   return ToJSValue(info, internal::Invoke<num_args>(
                              info, f, std::forward<DefaultArgs>(def_args)...));
@@ -464,6 +464,7 @@ void TypedCall(const Napi::CallbackInfo& info, void (*f)(Args...),
                DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   internal::Invoke<num_args>(info, f, std::forward<DefaultArgs>(def_args)...);
 }
@@ -473,6 +474,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...),
                       Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   return ToJSValue(
       info, internal::Invoke<num_args>(info, f, c,
@@ -484,6 +486,7 @@ void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...),
                Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -495,6 +498,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   return ToJSValue(
       info, internal::Invoke<num_args>(info, f, c,
@@ -506,6 +510,7 @@ void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const,
                const Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -517,6 +522,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   return ToJSValue(
       info, internal::Invoke<num_args>(info, f, c,
@@ -528,6 +534,7 @@ void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const&,
                const Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);
@@ -538,6 +545,7 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&,
                       Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   return ToJSValue(
       info, internal::Invoke<num_args>(info, f, c,
@@ -549,6 +557,7 @@ void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) &&,
                Class* c, DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  RETURN_IF_HAS_PENDING_EXCEPTION(info.Env());
 
   internal::Invoke<num_args>(info, f, c,
                              std::forward<DefaultArgs>(def_args)...);

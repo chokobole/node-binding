@@ -27,6 +27,7 @@ R TypedConstruct(const Napi::CallbackInfo& info, R (*f)(Args...),
                  DefaultArgs&&... def_args) {
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs);
   JS_CHECK_NUM_ARGS(info, num_args);
+  // TODO: How can stop calling constructor if there has a pending exception?
 
   return internal::Invoke<num_args>(info, f,
                                     std::forward<DefaultArgs>(def_args)...);
