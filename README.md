@@ -2,6 +2,56 @@
 
 This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github.com/nodejs/node-addon-api) easily.
 
+## Contents
+- [Node Binding](#node-binding)
+  - [Contents](#contents)
+  - [Overview](#overview)
+  - [How to use](#how-to-use)
+    - [bazel](#bazel)
+    - [node-gyp](#node-gyp)
+  - [Usages](#usages)
+    - [InstanceMethod with default arguments](#instancemethod-with-default-arguments)
+    - [Constructor](#constructor)
+    - [InstanceAccessor](#instanceaccessor)
+
+## Overview
+
+Please don't repeat `argument checking` or `type conversion`.
+
+```c++
+#include "napi.h"
+
+double CAdd(double arg0, double arg1) { return arg0 + arg1; }
+
+Napi::Value Add(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  if (info.Length() < 2) {
+    Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+  if (!info[0].IsNumber() || !info[1].IsNumber()) {
+    Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+  double arg0 = info[0].As<Napi::Number>().DoubleValue();
+  double arg1 = info[1].As<Napi::Number>().DoubleValue();
+  Napi::Number num = Napi::Number::New(env, CAdd(arg0, arg1);
+  return num;
+}
+```
+
+Instead do like below! Just this one line does everything above.
+
+```c++
+#include "node_binding/typed_call.h"
+
+double CAdd(double arg0, double arg1) { return arg0 + arg1; }
+
+Napi::Value Add(const Napi::CallbackInfo& info) {
+  return node_binding::TypedCall(info, &CAdd);
+}
+```
+
 ## How to use
 
 ### bazel
@@ -72,45 +122,9 @@ Follow [examples](https://github.com/nodejs/node-addon-examples)! But in `includ
 }
 ```
 
-## Examples
+## Usages
 
-Please don't do like below!
-
-```c++
-#include "napi.h"
-
-double CAdd(double arg0, double arg1) { return arg0 + arg1; }
-
-Napi::Value Add(const Napi::CallbackInfo& info) {
-  Napi::Env env = info.Env();
-  if (info.Length() < 2) {
-    Napi::TypeError::New(env, "Wrong number of arguments").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-  if (!info[0].IsNumber() || !info[1].IsNumber()) {
-    Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-  double arg0 = info[0].As<Napi::Number>().DoubleValue();
-  double arg1 = info[1].As<Napi::Number>().DoubleValue();
-  Napi::Number num = Napi::Number::New(env, CAdd(arg0, arg1);
-  return num;
-}
-```
-
-Instead please do like below!
-
-```c++
-#include "node_binding/typed_call.h"
-
-double CAdd(double arg0, double arg1) { return arg0 + arg1; }
-
-Napi::Value Add(const Napi::CallbackInfo& info) {
-  return node_binding::TypedCall(info, &CAdd);
-}
-```
-
-### InstanceMethod / StaticMethod with Default Arguments
+### InstanceMethod with default arguments
 
 You can find full code at [examples/calculator.cc](examples/calculator.cc).
 
