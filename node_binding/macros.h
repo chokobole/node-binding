@@ -38,4 +38,20 @@
   ::node_binding::TypeConvertor<::node_binding::internal::PickTypeListItem< \
       N, ArgList>>::ToNativeValue(info[N])
 
+#define RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS()                      \
+  ::Napi::Env env = info.Env();                                         \
+  constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs); \
+  JS_CHECK_NUM_ARGS(info, num_args);                                    \
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env);                       \
+  ArgTypeChecker<Args...>::Check(info, 0, num_args);                    \
+  RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env)
+
+#define RETURN_IF_FAILED_TO_CHECK_ARGS()                                \
+  ::Napi::Env env = info.Env();                                         \
+  constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs); \
+  JS_CHECK_NUM_ARGS(info, num_args);                                    \
+  RETURN_IF_HAS_PENDING_EXCEPTION(env);                                 \
+  ArgTypeChecker<Args...>::Check(info, 0, num_args);                    \
+  RETURN_IF_HAS_PENDING_EXCEPTION(env)
+
 #endif  // NODE_BINDING_MACROS_H_

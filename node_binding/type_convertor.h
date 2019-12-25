@@ -21,6 +21,10 @@ class TypeConvertor<bool> {
     return value.As<Napi::Boolean>().Value();
   }
 
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsBoolean();
+  }
+
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, bool value) {
     return Napi::Boolean::New(info.Env(), value);
   }
@@ -33,6 +37,10 @@ class TypeConvertor<T, std::enable_if_t<std::is_integral<T>::value &&
  public:
   static T ToNativeValue(const Napi::Value& value) {
     return static_cast<T>(value.As<Napi::Number>().Int32Value());
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
   }
 
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
@@ -50,6 +58,10 @@ class TypeConvertor<
     return value.As<Napi::Number>().Uint32Value();
   }
 
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
+  }
+
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
     return Napi::Number::New(info.Env(), value);
   }
@@ -63,6 +75,14 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<int64_t, T>::value>> {
     return value.As<Napi::BigInt>().Int64Value();
 #else
     return value.As<Napi::Number>().Int64Value();
+#endif
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+#ifdef NAPI_EXPERIMENTAL
+    return value.IsBigInt();
+#else
+    return value.IsNumber();
 #endif
   }
 
@@ -86,6 +106,14 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
 #endif
   }
 
+  static bool IsConvertible(const Napi::Value& value) {
+#ifdef NAPI_EXPERIMENTAL
+    return value.IsBigInt();
+#else
+    return value.IsNumber();
+#endif
+  }
+
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, uint64_t value) {
 #ifdef NAPI_EXPERIMENTAL
     return Napi::BigInt::New(info.Env(), value);
@@ -102,6 +130,10 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
     return value.As<Napi::Number>().FloatValue();
   }
 
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
+  }
+
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, float value) {
     return Napi::Number::New(info.Env(), value);
   }
@@ -112,6 +144,10 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<double, T>::value>> {
  public:
   static double ToNativeValue(const Napi::Value& value) {
     return value.As<Napi::Number>().DoubleValue();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
   }
 
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, double value) {
@@ -126,6 +162,10 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<std::string, T>::value>> {
     return value.As<Napi::String>().Utf8Value();
   }
 
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsString();
+  }
+
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
                                const std::string& value) {
     return Napi::String::New(info.Env(), value);
@@ -137,6 +177,10 @@ class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
  public:
   static std::underlying_type_t<T> ToNativeValue(const Napi::Value& value) {
     return TypeConvertor<std::underlying_type_t<T>>::ToNativeValue();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
   }
 
   static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
