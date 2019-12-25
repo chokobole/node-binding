@@ -43,7 +43,7 @@
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs); \
   JS_CHECK_NUM_ARGS(info, num_args);                                    \
   RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env);                       \
-  ArgTypeChecker<Args...>::Check(info, 0, num_args);                    \
+  ::node_binding::ArgTypeChecker<Args...>::Check(info, 0, num_args);    \
   RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env)
 
 #define RETURN_IF_FAILED_TO_CHECK_ARGS()                                \
@@ -51,7 +51,7 @@
   constexpr size_t num_args = sizeof...(Args) - sizeof...(DefaultArgs); \
   JS_CHECK_NUM_ARGS(info, num_args);                                    \
   RETURN_IF_HAS_PENDING_EXCEPTION(env);                                 \
-  ArgTypeChecker<Args...>::Check(info, 0, num_args);                    \
+  ::node_binding::ArgTypeChecker<Args...>::Check(info, 0, num_args);    \
   RETURN_IF_HAS_PENDING_EXCEPTION(env)
 
 #endif  // NODE_BINDING_MACROS_H_
