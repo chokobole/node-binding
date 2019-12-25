@@ -22,13 +22,13 @@ def node_addon_api_copts():
 
 def node_addon_api_defines():
     return [
-        "EXTERNAL_NAPI"
+        "EXTERNAL_NAPI",
+        "NAPI_DISABLE_CPP_EXCEPTIONS",
     ] + select({
         "//:windows": [
             "USING_UV_SHARED=1",
             "USING_V8_SHARED=1",
             "V8_DEPRECATION_WARNINGS=1",
-            "NAPI_DISABLE_CPP_EXCEPTIONS",
             "BUILDING_NODE_EXTENSION",
         ],
         "//conditions:default": [],
