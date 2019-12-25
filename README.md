@@ -6,23 +6,56 @@ This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github
 
 ### bazel
 
+To use `node_binding`, add the followings to your `WORKSPACE` file.
+
 ```python
-load("@com_github_chokobole_node_binding//bazel:node_binding.bzl", "node_binding")
-load("@com_github_chokobole_node_binding//bazel:node_binding_cc.bzl", "node_binding_copts")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "node_binding",
+    sha256 = "<sha256>",
+    strip_prefix = "node-binding-<commit>",
+    urls = [
+        "https://github.com/chokobole/node-binding/archive/<commit>.tar.gz",
+    ],
+)
+
+load("@node_binding//bazel:node_binding_deps.bzl", "node_binding_deps")
+
+node_binding_deps()
+
+load("@node_binding//third_party/node_addon_api:install_node_addon_api.bzl", "install_node_addon_api")
+
+install_node_addon_api(name = "node_addon_api")
+```
+
+Then, in your `BUILD` files, import and use the rules.
+
+```python
+load("@node_binding//bazel:node_binding.bzl", "node_binding")
+load("@node_binding//bazel:node_binding_cc.bzl", "node_binding_copts")
 
 node_binding(
-    name = "...",
+    name = "name",
     srcs = [
       ...
     ],
     copts = node_binding_copts(),
     deps = [
-        "@com_github_chokobole_node_binding//:node_binding",
+        "@node_binding",
     ],
 )
 ```
 
+Then this rule generates `name.node`.
+
 ### node-gyp
+
+To use `node-binding`, install package via `npm install`.
+
+```bash
+npm install node-binding
+```
 
 Follow [examples](https://github.com/nodejs/node-addon-examples)! But in `include_dirs`, fill like below.
 
