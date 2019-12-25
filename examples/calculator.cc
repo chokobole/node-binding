@@ -77,6 +77,7 @@ void CalculatorJs::Init(Napi::Env env, Napi::Object exports) {
 
 CalculatorJs::CalculatorJs(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<CalculatorJs>(info) {
+  Napi::Env env = info.Env();
   if (info.Length() == 0) {
     calculator_ = std::unique_ptr<Calculator>(
         TypedConstruct(info, &Constructor<Calculator>::CallNew<>));
@@ -84,9 +85,10 @@ CalculatorJs::CalculatorJs(const Napi::CallbackInfo& info)
     calculator_ = std::unique_ptr<Calculator>(
         TypedConstruct(info, &Constructor<Calculator>::CallNew<int>));
   } else {
-    Napi::Env env = info.Env();
     THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
   }
+
+  if (env.IsExceptionPending()) calculator_.reset();
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
