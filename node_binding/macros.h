@@ -14,12 +14,8 @@
   ::Napi::TypeError::New(env, "Wrong number of arguments") \
       .ThrowAsJavaScriptException()
 
-#define JS_CHECK_NUM_ARGS(info, num_args)             \
-  do {                                                \
-    if (info.Length() != num_args) {                  \
-      THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(info.Env()); \
-    }                                                 \
-  } while (0)
+#define JS_CHECK_NUM_ARGS(info, num_args) \
+  if (info.Length() != num_args) THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(info.Env())
 
 #ifdef NAPI_CPP_EXCEPTIONS
 #define RETURN_IF_HAS_PENDING_EXCEPTION(env)
@@ -33,10 +29,6 @@
 #define RETURN_NULL_IF_HAS_PENDING_EXCEPTION(env) \
   if (env.IsExceptionPending()) return env.Null()
 #endif
-
-#define ARG(N)                                                              \
-  ::node_binding::TypeConvertor<::node_binding::internal::PickTypeListItem< \
-      N, ArgList>>::ToNativeValue(info[N])
 
 #define RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS()                      \
   ::Napi::Env env = info.Env();                                         \

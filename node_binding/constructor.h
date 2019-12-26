@@ -29,8 +29,8 @@ R TypedConstruct(const Napi::CallbackInfo& info, R (*f)(Args...),
   JS_CHECK_NUM_ARGS(info, num_args);
   // TODO: How can stop calling constructor if there has a pending exception?
 
-  return internal::Invoke<num_args>(info, f,
-                                    std::forward<DefaultArgs>(def_args)...);
+  return internal::Invoke(info, f, std::make_index_sequence<num_args>(),
+                          std::forward<DefaultArgs>(def_args)...);
 }
 
 }  // namespace node_binding

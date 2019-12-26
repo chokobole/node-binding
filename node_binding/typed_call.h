@@ -5,6 +5,8 @@
 #ifndef NODE_BINDING_TYPED_CALL_H_
 #define NODE_BINDING_TYPED_CALL_H_
 
+#include <utility>
+
 #include "napi.h"
 #include "node_binding/arg_type_checker.h"
 #include "node_binding/macros.h"
@@ -15,435 +17,56 @@ namespace node_binding {
 
 namespace internal {
 
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<0 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  return f(std::forward<DefaultArgs>(def_args)...);
+template <size_t Idx, typename ArgList>
+auto Arg(const Napi::CallbackInfo& info) {
+  return TypeConvertor<internal::PickTypeListItem<Idx, ArgList>>::ToNativeValue(
+      info[Idx]);
 }
 
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<1 == N>* = nullptr>
+template <typename R, typename... Args, size_t... Indices,
+          typename... DefaultArgs>
 R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
+         std::index_sequence<Indices...>, DefaultArgs&&... def_args) {
   using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<2 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<3 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<4 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3),
+  return f(Arg<Indices, ArgList>(info)...,
            std::forward<DefaultArgs>(def_args)...);
 }
 
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<5 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4),
-           std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<6 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-           std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<7 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-           std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<8 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6), ARG(7),
-           std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename... Args, typename... DefaultArgs,
-          std::enable_if_t<9 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (*f)(Args...),
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return f(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6), ARG(7),
-           ARG(8), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<0 == N>* = nullptr>
+template <typename R, typename Class, typename... Args, size_t... Indices,
+          typename... DefaultArgs>
 R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  return ((*c).*f)(std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<1 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
+         std::index_sequence<Indices...>, DefaultArgs&&... def_args) {
   using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<2 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<3 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2),
+  return ((*c).*f)(Arg<Indices, ArgList>(info)...,
                    std::forward<DefaultArgs>(def_args)...);
 }
 
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<4 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<5 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<6 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<7 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<8 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<9 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...), Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), ARG(8), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<0 == N>* = nullptr>
+template <typename R, typename Class, typename... Args, size_t... Indices,
+          typename... DefaultArgs>
 R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  return ((*c).*f)(std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<1 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
+         const Class* c, std::index_sequence<Indices...>,
+         DefaultArgs&&... def_args) {
   using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<2 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<3 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2),
+  return ((*c).*f)(Arg<Indices, ArgList>(info)...,
                    std::forward<DefaultArgs>(def_args)...);
 }
 
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<4 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
+template <typename R, typename Class, typename... Args, size_t... Indices,
+          typename... DefaultArgs>
+R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
+         const Class* c, std::index_sequence<Indices...>,
+         DefaultArgs&&... def_args) {
   using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3),
+  return ((*c).*f)(Arg<Indices, ArgList>(info)...,
                    std::forward<DefaultArgs>(def_args)...);
 }
 
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<5 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<6 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<7 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<8 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<9 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), ARG(8), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<0 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  return ((*c).*f)(std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<1 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<2 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<3 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<4 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<5 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<6 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<7 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<8 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<9 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) const&,
-         const Class* c, DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return ((*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5), ARG(6),
-                   ARG(7), ARG(8), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<0 == N>* = nullptr>
+template <typename R, typename Class, typename... Args, size_t... Indices,
+          typename... DefaultArgs>
 R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  return (std::move(*c).*f)(std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<1 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
+         std::index_sequence<Indices...>, DefaultArgs&&... def_args) {
   using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<2 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<3 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<4 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<5 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<6 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<7 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                            ARG(6), std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<8 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                            ARG(6), ARG(7),
-                            std::forward<DefaultArgs>(def_args)...);
-}
-
-template <size_t N, typename R, typename Class, typename... Args,
-          typename... DefaultArgs, std::enable_if_t<9 == N>* = nullptr>
-R Invoke(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&, Class* c,
-         DefaultArgs&&... def_args) {
-  using ArgList = internal::TypeList<Args...>;
-  return (std::move(*c).*f)(ARG(0), ARG(1), ARG(2), ARG(3), ARG(4), ARG(5),
-                            ARG(6), ARG(7), ARG(8),
+  return (std::move(*c).*f)(Arg<Indices, ArgList>(info)...,
                             std::forward<DefaultArgs>(def_args)...);
 }
 
@@ -453,15 +76,17 @@ template <typename R, typename... Args, typename... DefaultArgs>
 Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
-  return ToJSValue(info, internal::Invoke<num_args>(
-                             info, f, std::forward<DefaultArgs>(def_args)...));
+  return ToJSValue(
+      info, internal::Invoke(info, f, std::make_index_sequence<num_args>(),
+                             std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (*f)(Args...),
                DefaultArgs&&... def_args) {
   RETURN_IF_FAILED_TO_CHECK_ARGS();
-  internal::Invoke<num_args>(info, f, std::forward<DefaultArgs>(def_args)...);
+  internal::Invoke(info, f, std::make_index_sequence<num_args>(),
+                   std::forward<DefaultArgs>(def_args)...);
 }
 
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
@@ -469,16 +94,16 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...),
                       Class* c, DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke<num_args>(info, f, c,
-                                       std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                             std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...),
                Class* c, DefaultArgs&&... def_args) {
   RETURN_IF_FAILED_TO_CHECK_ARGS();
-  internal::Invoke<num_args>(info, f, c,
-                             std::forward<DefaultArgs>(def_args)...);
+  internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                   std::forward<DefaultArgs>(def_args)...);
 }
 
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
@@ -487,16 +112,16 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke<num_args>(info, f, c,
-                                       std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                             std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const,
                const Class* c, DefaultArgs&&... def_args) {
   RETURN_IF_FAILED_TO_CHECK_ARGS();
-  internal::Invoke<num_args>(info, f, c,
-                             std::forward<DefaultArgs>(def_args)...);
+  internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                   std::forward<DefaultArgs>(def_args)...);
 }
 
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
@@ -505,16 +130,16 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke<num_args>(info, f, c,
-                                       std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                             std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) const&,
                const Class* c, DefaultArgs&&... def_args) {
   RETURN_IF_FAILED_TO_CHECK_ARGS();
-  internal::Invoke<num_args>(info, f, c,
-                             std::forward<DefaultArgs>(def_args)...);
+  internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                   std::forward<DefaultArgs>(def_args)...);
 }
 
 template <typename R, typename Class, typename... Args, typename... DefaultArgs>
@@ -522,16 +147,16 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&,
                       Class* c, DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke<num_args>(info, f, c,
-                                       std::forward<DefaultArgs>(def_args)...));
+      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                             std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
 void TypedCall(const Napi::CallbackInfo& info, void (Class::*f)(Args...) &&,
                Class* c, DefaultArgs&&... def_args) {
   RETURN_IF_FAILED_TO_CHECK_ARGS();
-  internal::Invoke<num_args>(info, f, c,
-                             std::forward<DefaultArgs>(def_args)...);
+  internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                   std::forward<DefaultArgs>(def_args)...);
 }
 
 }  // namespace node_binding
