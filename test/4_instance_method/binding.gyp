@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "4_stl",
+      "target_name": "4_instance_method",
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"],
       "sources": ["addon.cc"],

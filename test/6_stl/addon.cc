@@ -35,4 +35,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-NODE_API_MODULE(4_stl, Init)
+NODE_API_MODULE(6_stl, Init)

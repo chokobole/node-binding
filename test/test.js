@@ -9,7 +9,10 @@ const test1 =
 const test2 = require('./2_constructor/build/Release/2_constructor.node');
 const test3 =
     require('./3_instance_accessor/build/Release/3_instance_accessor.node');
-const test4 = require('./4_stl/build/Release/4_stl.node');
+const test4 =
+    require('./4_instance_method/build/Release/4_instance_method.node');
+const test5 = require('./5_static_method/build/Release/5_static_method.node');
+const test6 = require('./6_stl/build/Release/6_stl.node');
 
 describe('0_function', () => {
   it('add(int arg0, int arg1) bind', () => {
@@ -58,9 +61,24 @@ describe('3_instance_accessor', () => {
   });
 });
 
-describe('4_stl', () => {
+describe('4_instance_method', () => {
+  it('Rect::size() bind', () => {
+    const r = new test4.Rect(5, 2);
+    assert.equal(r.size(), 10);
+  });
+});
+
+describe('5_static_method', () => {
+  it('Adder::add(int a, int b) bind', () => {
+    assert.equal(test5.Adder.add(), 3);
+    assert.equal(test5.Adder.add(1), 3);
+    assert.equal(test5.Adder.add(1, 2), 3);
+  });
+});
+
+describe('6_stl', () => {
   it('std::vector<int> bind', () => {
-    assert.equal(test4.sum([1, 2, 3]), 6);
-    assert.deepEqual(test4.linSpace(1, 5, 1), [1, 2, 3, 4]);
+    assert.equal(test6.sum([1, 2, 3]), 6);
+    assert.deepEqual(test6.linSpace(1, 5, 1), [1, 2, 3, 4]);
   });
 });
