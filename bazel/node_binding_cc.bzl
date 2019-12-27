@@ -5,6 +5,5 @@ def node_binding_copts():
         ],
         "//conditions:default": [
             "-std=c++14",
-            "-fvisibility=hidden",
         ],
     })
