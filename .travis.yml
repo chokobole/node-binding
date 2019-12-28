@@ -11,7 +11,10 @@ matrix:
         - ./installers/install_bazel.sh
         - ./installers/install_nodejs.sh && nvm alias default v12.14.0 && nvm use default
       script:
-        - bazel build //examples:calculator_node && node examples/calculator.js
+        - bazel build //examples/...
+        - node examples/calculator.js
+        - node examples/point.js
+        - node examples/rect.js
       after_failure:
         - find bazel-out/ -name "test.log" | xargs cat
     - os: osx
@@ -26,7 +29,10 @@ matrix:
         - ./installers/install_bazel.sh
         - ./installers/install_nodejs.sh && nvm alias default v12.14.0 && nvm use default
       script:
-        - bazel build //examples:calculator_node && node examples/calculator.js
+        - bazel build //examples/...
+        - node examples/calculator.js
+        - node examples/point.js
+        - node examples/rect.js
       after_failure:
         - find bazel-out/ -name "test.log" | xargs cat
     - os: windows
@@ -37,7 +43,10 @@ matrix:
         - choco install bazel --version 1.2.0
         - choco install nodejs.install --version 12.14.0
       script:
-        - bazel build ///examples:calculator_node && node examples/calculator.js
+        - bazel build //examples/...
+        - node examples/calculator.js
+        - node examples/point.js
+        - node examples/rect.js
       after_failure:
         - find bazel-out/ -name "test.log" | xargs cat
 

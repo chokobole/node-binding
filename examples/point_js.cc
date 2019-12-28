@@ -2,39 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "examples/point.h"
+#include "examples/point_js.h"
 
 #include "node_binding/constructor.h"
-#include "node_binding/typed_call.h"
+#include "node_binding/type_convertor.h"
 
-namespace node_binding {
-
-class PointJs : public Napi::ObjectWrap<PointJs> {
- public:
-  static void Init(Napi::Env env, Napi::Object exports);
-  PointJs(const Napi::CallbackInfo& info);
-
-  void SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.x = ToNativeValue<int>(v);
-  }
-
-  void SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.y = ToNativeValue<int>(v);
-  }
-
-  Napi::Value GetX(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.x);
-  }
-
-  Napi::Value GetY(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.y);
-  }
-
- private:
-  static Napi::FunctionReference constructor_;
-
-  Point point_;
-};
+using namespace node_binding;
 
 Napi::FunctionReference PointJs::constructor_;
 
@@ -53,6 +26,18 @@ void PointJs::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("Point", func);
 }
 
+// static
+Napi::Object PointJs::New(Napi::Env env, const Point& p) {
+  Napi::EscapableHandleScope scope(env);
+
+  Napi::Object object = constructor_.New({
+      Napi::Number::New(env, p.x),
+      Napi::Number::New(env, p.y),
+  });
+
+  return scope.Escape(napi_value(object)).ToObject();
+}
+
 PointJs::PointJs(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<PointJs>(info) {
   if (info.Length() == 0) {
@@ -67,12 +52,18 @@ PointJs::PointJs(const Napi::CallbackInfo& info)
   }
 }
 
-Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  PointJs::Init(env, exports);
-
-  return exports;
+void PointJs::SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
+  point_.x = ToNativeValue<int>(v);
 }
 
-NODE_API_MODULE(point, Init)
+void PointJs::SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
+  point_.y = ToNativeValue<int>(v);
+}
 
-}  // namespace node_binding
+Napi::Value PointJs::GetX(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, point_.x);
+}
+
+Napi::Value PointJs::GetY(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, point_.y);
+}

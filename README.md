@@ -14,6 +14,8 @@ This is a helper to bind `c++` to `nodejs` using [node-addon-api](https://github
     - [Constructor](#constructor)
     - [InstanceAccessor](#instanceaccessor)
     - [STL containers](#stl-containers)
+    - [Conversion](#conversion)
+    - [Custom Conversion](#custom-conversion)
 
 ## Overview
 
@@ -127,9 +129,8 @@ Follow [examples](https://github.com/nodejs/node-addon-examples)! But in `includ
 
 ### InstanceMethod with default arguments
 
-You can find full code at [examples/calculator.cc](examples/calculator.cc).
-
 ```c++
+// examples/calculator.h
 class Calculator {
  public:
   void Increment(int a = 1) { result_ += a; }
@@ -137,30 +138,42 @@ class Calculator {
  private:
   int result_;
 };
+```
 
-namespace node_binding {
-
+```c++
+// examples/calculator_js.h
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  public:
-  void Increment(const Napi::CallbackInfo& info) {
-    if (info.Length() == 0) {
-      TypedCall(info, &Calculator::Increment, calculator_.get(), 1);
-    } else {
-      TypedCall(info, &Calculator::Increment, calculator_.get());
-    }
-  }
+  void Increment(const Napi::CallbackInfo& info);
 };
+```
 
-}  // namespace node_binding
+```c++
+// examples/calculator_js.cc
+void CalculatorJs::Increment(const Napi::CallbackInfo& info) {
+  if (info.Length() == 0) {
+    TypedCall(info, &Calculator::Increment, calculator_.get(), 1);
+  } else {
+    TypedCall(info, &Calculator::Increment, calculator_.get());
+  }
+}
+```
+
+```js
+// examples/calculator.js
+const c = new calculator.Calculator();
+c.increment();
+c.increment(1);
 ```
 
 ### Constructor
 
-You can find full code at [examples/calculator.cc](examples/calculator.cc).
+To bind constructor, you have to include `#include "node_binding/constructor.h"`.
 
 `Constructor<Class>::CallNew<Args>` calls `new Class(Args)`, whereas, `Constructor<Class>::Calls<Args>` calls `Class(Args)`.
 
 ```c++
+// examples/calculator.h
 class Calculator {
  public:
   Calculator() : result_(0) {}
@@ -169,76 +182,106 @@ class Calculator {
  private:
   int result_;
 };
+```
 
-namespace node_binding {
-
+```c++
+// examples/calculator_js.h
 class CalculatorJs : public Napi::ObjectWrap<CalculatorJs> {
  public:
-  CalculatorJs(const Napi::CallbackInfo& info)
+  CalculatorJs(const Napi::CallbackInfo& info);
+};
+```
+
+```c++
+// examples/calculator_js.cc
+#include "node_binding/constructor.h"
+
+CalculatorJs::CalculatorJs(const Napi::CallbackInfo& info)
     : Napi::ObjectWrap<CalculatorJs>(info) {
-    if (info.Length() == 0) {
-      calculator_ = std::unique_ptr<Calculator>(
-          TypedConstruct(info, &Constructor<Calculator>::CallNew<>));
-    } else if (info.Length() == 1) {
-      calculator_ = std::unique_ptr<Calculator>(
-          TypedConstruct(info, &Constructor<Calculator>::CallNew<int>));
-    } else {
-      Napi::Env env = info.Env();
-      THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
-    }
+  Napi::Env env = info.Env();
+  if (info.Length() == 0) {
+    calculator_ = std::unique_ptr<Calculator>(
+        TypedConstruct(info, &Constructor<Calculator>::CallNew<>));
+  } else if (info.Length() == 1) {
+    calculator_ = std::unique_ptr<Calculator>(
+        TypedConstruct(info, &Constructor<Calculator>::CallNew<int>));
+  } else {
+    THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(env);
   }
 
- private:
-  std::unique_ptr<Calculator> calculator_;
-};
+  if (env.IsExceptionPending()) calculator_.reset();
+}
+```
 
-}  // namespace node_binding
+```js
+// examples/calculator.js
+new Calculator();
+new Calculator(0);
+new Calculator(0, 0);  // Throws exception!
 ```
 
 ### InstanceAccessor
 
-You can find full code at [examples/point.cc](examples/point.cc).
-
 ```c++
+// examples/point.h
 struct Point {
   int x;
   int y;
 
   Point(int x = 0, int y = 0) : x(x), y(y) {}
 };
+```
 
-namespace node_binding {
-
+```c++
+// examples/point_js.h
 class PointJs : public Napi::ObjectWrap<PointJs> {
  public:
-  void SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.x = ToNativeValue<int>(v);
-  }
+  void SetX(const Napi::CallbackInfo& info, const Napi::Value& v);
+  void SetY(const Napi::CallbackInfo& info, const Napi::Value& v);
 
-  void SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
-    point_.y = ToNativeValue<int>(v);
-  }
-
-  Napi::Value GetX(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.x);
-  }
-
-  Napi::Value GetY(const Napi::CallbackInfo& info) {
-    return ToJSValue(info, point_.y);
-  }
+  Napi::Value GetX(const Napi::CallbackInfo& info);
+  Napi::Value GetY(const Napi::CallbackInfo& info);
 
  private:
   Point point_;
 };
+```
 
-}  // namespace node_binding
+```c++
+// examples/point_js.cc
+void PointJs::SetX(const Napi::CallbackInfo& info, const Napi::Value& v) {
+  point_.x = ToNativeValue<int>(v);
+}
+
+void PointJs::SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
+  point_.y = ToNativeValue<int>(v);
+}
+
+Napi::Value PointJs::GetX(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, point_.x);
+}
+
+Napi::Value PointJs::GetY(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, point_.y);
+}
+
+```
+
+```js
+// examples/point.js
+const p = new Point();
+p.x = 1;
+p.y = p.x * 2;
 ```
 
 ### STL containers
 
-You can find full code at [test/4_stl/addon.cc](test/4_stl/addon.cc). To bind `std::vector<T>`, you have to include `#include "node_binding/stl.h"`.
+To bind `std::vector<T>`, you have to include `#include "node_binding/stl.h"`.
 
 ```c++
+// test/4_stl/addon.cc
+#include "node_binding/stl.h"
+
 int Sum(const std::vector<int>& vec) {
   int ret = 0;
   for (int v: vec) {
@@ -254,10 +297,142 @@ std::vector<int> LinSpace(int from, int to, int step) {
   }
   return ret;
 }
+```
 
-Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  exports.Set("sum", Napi::Function::New(env, Sum));
-  exports.Set("linSpace", Napi::Function::New(env, LinSpace));
-  return exports;
+```js
+// test/test.js
+console.log(sum([1, 2, 3]));  // 6
+console.log(linSpace(1, 5, 1));  // [1, 2, 3, 4]
+```
+
+### Conversion
+
+| c++         | js                | REFERENCE                          |
+| ----------: | ----------------: | ---------------------------------: |
+| bool        | boolean           |                                    |
+| uint8_t     | number            |                                    |
+| int8_t      | number            |                                    |
+| uint16_t    | number            |                                    |
+| int16_t     | number            |                                    |
+| uint32_t    | number            |                                    |
+| int32_t     | number            |                                    |
+| uint64_t    | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| uint64_t    | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| float       | number            |                                    |
+| double      | number            |                                    |
+| std::string | string            |                                    |
+| std::vector | Array             |                                    |
+
+### Custom Conversion
+
+To bind your own class, you have to include `#include "node_binding/type_convertor.h"` and write your own specialized template class `TypeConvertor<>` for your own class.
+
+```c++
+// examples/point_js.h
+#include "node_binding/type_convertor.h"
+
+class PointJs : public Napi::ObjectWrap<PointJs> {
+ public:
+  static Napi::Object New(Napi::Env env, const Point& p);
+};
+
+namespace node_binding {
+
+template <>
+class TypeConvertor<Point> {
+ public:
+  static Point ToNativeValue(const Napi::Value& value) {
+    Napi::Object obj = value.As<Napi::Object>();
+
+    return {
+        TypeConvertor<int>::ToNativeValue(obj["x"]),
+        TypeConvertor<int>::ToNativeValue(obj["y"]),
+    };
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    if (!value.IsObject()) return false;
+
+    Napi::Object obj = value.As<Napi::Object>();
+
+    return TypeConvertor<int>::IsConvertible(obj["x"]) &&
+           TypeConvertor<int>::IsConvertible(obj["y"]);
+  }
+
+  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
+                               const Point& value) {
+    return PointJs::New(info.Env(), value);
+  }
+};
+
+}  // namespace node_binding
+```
+
+```c++
+// examples/point_js.cc
+Napi::Object PointJs::New(Napi::Env env, const Point& p) {
+  Napi::EscapableHandleScope scope(env);
+
+  Napi::Object object = constructor_.New({
+      Napi::Number::New(env, p.x),
+      Napi::Number::New(env, p.y),
+  });
+
+  return scope.Escape(napi_value(object)).ToObject();
 }
+```
+
+```c++
+// examples/rect.h
+#include "examples/point.h"
+
+struct Rect {
+  Point top_left;
+  Point bottom_right;
+};
+```
+
+```c++
+// examples/rect_js.h
+class RectJs : public Napi::ObjectWrap<RectJs> {
+ public:
+  void SetTopLeft(const Napi::CallbackInfo& info, const Napi::Value& v);
+  void SetBottomRight(const Napi::CallbackInfo& info, const Napi::Value& v);
+
+  Napi::Value GetTopLeft(const Napi::CallbackInfo& info);
+  Napi::Value GetBottomRight(const Napi::CallbackInfo& info);
+};
+```
+
+```c++
+// examples/rect_js.cc
+#include "examples/point_js.h"
+
+void RectJs::SetTopLeft(const Napi::CallbackInfo& info, const Napi::Value& v) {
+  if (IsConvertible<Point>(v)) {
+    rect_.top_left = ToNativeValue<Point>(v);
+  }
+}
+
+void RectJs::SetBottomRight(const Napi::CallbackInfo& info,
+                            const Napi::Value& v) {
+  if (IsConvertible<Point>(v)) {
+    rect_.bottom_right = ToNativeValue<Point>(v);
+  }
+}
+
+Napi::Value RectJs::GetTopLeft(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, rect_.top_left);
+}
+
+Napi::Value RectJs::GetBottomRight(const Napi::CallbackInfo& info) {
+  return ToJSValue(info, rect_.bottom_right);
+}
+```
+
+```js
+// examples/rect.js
+const topLeft = new Point(1, 5);
+const bottomRight = new Point(5, 1);
+const rect = new Rect(topLeft, bottomRight);
 ```

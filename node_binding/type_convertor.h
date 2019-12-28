@@ -195,6 +195,11 @@ auto ToNativeValue(const Napi::Value& value) {
 }
 
 template <typename T>
+bool IsConvertible(const Napi::Value& value) {
+  return TypeConvertor<T>::IsConvertible(value);
+}
+
+template <typename T>
 Napi::Value ToJSValue(const Napi::CallbackInfo& info, T&& value) {
   return TypeConvertor<std::decay_t<T>>::ToJSValue(info,
                                                    std::forward<T>(value));

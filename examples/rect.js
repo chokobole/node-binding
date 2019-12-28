@@ -8,9 +8,9 @@ function printPoint(p) {
   console.log(`(${p.x}, ${p.y})`);
 }
 
-const p = new binding.Point();
-p.x = 1;
-p.y = p.x + 2;
-printPoint(p);
-const p2 = new binding.Point(2, 4);
-printPoint(p2);
+const topLeft = new binding.Point(1, 5);
+const bottomRight = new binding.Point(5, 1);
+const rect = new binding.Rect(topLeft, bottomRight);
+printPoint(rect.topLeft);
+printPoint(rect.bottomRight);
+console.log(rect.area());
