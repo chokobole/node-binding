@@ -20,7 +20,9 @@
   },
   "scripts": {
     "pretest": "./test/build_all.sh",
-    "test": "mocha"
+    "pretest:win32": ".\\test\\build_all.sh",
+    "test": "mocha",
+    "test:win32": "mocha"
   },
   "version": "1.4.0",
   "dependencies": {

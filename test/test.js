@@ -81,4 +81,20 @@ describe('6_stl', () => {
     assert.equal(test6.sum([1, 2, 3]), 6);
     assert.deepEqual(test6.linSpace(1, 5, 1), [1, 2, 3, 4]);
   });
+  it('std::function<bool (std::string, int)> bind', () => {
+    assert.equal(
+        test6.callbackWithStatus(function(str, num) {
+          assert.equal(str, 'test');
+          assert.equal(num, 1234);
+          return true;
+        }),
+        true);
+  });
+  it('std::function<void (std::string, int)> bind', () => {
+    test6.callback(function(str, num) {
+      assert.equal(str, 'test');
+      assert.equal(num, 1234);
+      return true;
+    });
+  });
 });
