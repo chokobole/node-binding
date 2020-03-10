@@ -77,8 +77,9 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (*f)(Args...),
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke(info, f, std::make_index_sequence<num_args>(),
-                             std::forward<DefaultArgs>(def_args)...));
+      info.Env(),
+      internal::Invoke(info, f, std::make_index_sequence<num_args>(),
+                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename... Args, typename... DefaultArgs>
@@ -94,8 +95,9 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...),
                       Class* c, DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
-                             std::forward<DefaultArgs>(def_args)...));
+      info.Env(),
+      internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
@@ -112,8 +114,9 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
-                             std::forward<DefaultArgs>(def_args)...));
+      info.Env(),
+      internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
@@ -130,8 +133,9 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info,
                       DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
-                             std::forward<DefaultArgs>(def_args)...));
+      info.Env(),
+      internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>
@@ -147,8 +151,9 @@ Napi::Value TypedCall(const Napi::CallbackInfo& info, R (Class::*f)(Args...) &&,
                       Class* c, DefaultArgs&&... def_args) {
   RETURN_UNDEFINED_IF_FAILED_TO_CHECK_ARGS();
   return ToJSValue(
-      info, internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
-                             std::forward<DefaultArgs>(def_args)...));
+      info.Env(),
+      internal::Invoke(info, f, c, std::make_index_sequence<num_args>(),
+                       std::forward<DefaultArgs>(def_args)...));
 }
 
 template <typename Class, typename... Args, typename... DefaultArgs>

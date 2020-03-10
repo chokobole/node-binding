@@ -50,9 +50,8 @@ class TypeConvertor<Point> {
            TypeConvertor<int>::IsConvertible(obj["y"]);
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
-                               const Point& value) {
-    return PointJs::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, const Point& value) {
+    return PointJs::New(env, value);
   }
 };
 

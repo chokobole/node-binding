@@ -25,8 +25,8 @@ class TypeConvertor<bool> {
     return value.IsBoolean();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, bool value) {
-    return Napi::Boolean::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, bool value) {
+    return Napi::Boolean::New(env, value);
   }
 };
 
@@ -43,8 +43,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_integral<T>::value &&
     return value.IsNumber();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
-    return Napi::Number::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, T value) {
+    return Napi::Number::New(env, value);
   }
 };
 
@@ -62,8 +62,8 @@ class TypeConvertor<
     return value.IsNumber();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
-    return Napi::Number::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, T value) {
+    return Napi::Number::New(env, value);
   }
 };
 
@@ -86,11 +86,11 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<int64_t, T>::value>> {
 #endif
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, int64_t value) {
+  static Napi::Value ToJSValue(const Napi::Env& env, int64_t value) {
 #ifdef NAPI_EXPERIMENTAL
-    return Napi::BigInt::New(info.Env(), value);
+    return Napi::BigInt::New(env, value);
 #else
-    return Napi::Number::New(info.Env(), value);
+    return Napi::Number::New(env, value);
 #endif
   }
 };
@@ -114,11 +114,11 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
 #endif
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, uint64_t value) {
+  static Napi::Value ToJSValue(const Napi::Env& env, uint64_t value) {
 #ifdef NAPI_EXPERIMENTAL
-    return Napi::BigInt::New(info.Env(), value);
+    return Napi::BigInt::New(env, value);
 #else
-    return Napi::Number::New(info.Env(), value);
+    return Napi::Number::New(env, value);
 #endif
   }
 };
@@ -134,8 +134,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
     return value.IsNumber();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, float value) {
-    return Napi::Number::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, float value) {
+    return Napi::Number::New(env, value);
   }
 };
 
@@ -150,8 +150,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<double, T>::value>> {
     return value.IsNumber();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, double value) {
-    return Napi::Number::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, double value) {
+    return Napi::Number::New(env, value);
   }
 };
 
@@ -166,9 +166,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<std::string, T>::value>> {
     return value.IsString();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
-                               const std::string& value) {
-    return Napi::String::New(info.Env(), value);
+  static Napi::Value ToJSValue(const Napi::Env& env, const std::string& value) {
+    return Napi::String::New(env, value);
   }
 };
 
@@ -183,8 +182,8 @@ class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
     return value.IsNumber();
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info, T value) {
-    return Napi::Number::New(info.Env(),
+  static Napi::Value ToJSValue(const Napi::Env& env, T value) {
+    return Napi::Number::New(env,
                              static_cast<std::underlying_type_t<T>>(value));
   }
 };
@@ -200,9 +199,8 @@ bool IsConvertible(const Napi::Value& value) {
 }
 
 template <typename T>
-Napi::Value ToJSValue(const Napi::CallbackInfo& info, T&& value) {
-  return TypeConvertor<std::decay_t<T>>::ToJSValue(info,
-                                                   std::forward<T>(value));
+Napi::Value ToJSValue(const Napi::Env& env, T&& value) {
+  return TypeConvertor<std::decay_t<T>>::ToJSValue(env, std::forward<T>(value));
 }
 
 }  // namespace node_binding

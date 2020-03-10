@@ -61,9 +61,9 @@ void PointJs::SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
 }
 
 Napi::Value PointJs::GetX(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, point_.x);
+  return ToJSValue(info.Env(), point_.x);
 }
 
 Napi::Value PointJs::GetY(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, point_.y);
+  return ToJSValue(info.Env(), point_.y);
 }

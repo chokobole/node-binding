@@ -33,11 +33,11 @@ class TypeConvertor<std::vector<T>> {
     return true;
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
+  static Napi::Value ToJSValue(const Napi::Env& env,
                                const std::vector<T>& value) {
-    Napi::Array ret = Napi::Array::New(info.Env(), value.size());
+    Napi::Array ret = Napi::Array::New(env, value.size());
     for (size_t i = 0; i < value.size(); ++i) {
-      ret[i] = TypeConvertor<T>::ToJSValue(info, value[i]);
+      ret[i] = TypeConvertor<T>::ToJSValue(env, value[i]);
     }
     return ret;
   }

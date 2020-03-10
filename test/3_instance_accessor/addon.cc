@@ -21,11 +21,11 @@ class PointJs : public Napi::ObjectWrap<PointJs> {
   }
 
   Napi::Value GetX(const Napi::CallbackInfo& info) {
-    return node_binding::ToJSValue(info, point_.x);
+    return node_binding::ToJSValue(info.Env(), point_.x);
   }
 
   Napi::Value GetY(const Napi::CallbackInfo& info) {
-    return node_binding::ToJSValue(info, point_.y);
+    return node_binding::ToJSValue(info.Env(), point_.y);
   }
 
  private:
