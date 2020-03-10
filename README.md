@@ -258,11 +258,11 @@ void PointJs::SetY(const Napi::CallbackInfo& info, const Napi::Value& v) {
 }
 
 Napi::Value PointJs::GetX(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, point_.x);
+  return ToJSValue(info.Env(), point_.x);
 }
 
 Napi::Value PointJs::GetY(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, point_.y);
+  return ToJSValue(info.Env(), point_.y);
 }
 
 ```
@@ -307,21 +307,22 @@ console.log(linSpace(1, 5, 1));  // [1, 2, 3, 4]
 
 ### Conversion
 
-| c++         | js                | REFERENCE                          |
-| ----------: | ----------------: | ---------------------------------: |
-| bool        | boolean           |                                    |
-| uint8_t     | number            |                                    |
-| int8_t      | number            |                                    |
-| uint16_t    | number            |                                    |
-| int16_t     | number            |                                    |
-| uint32_t    | number            |                                    |
-| int32_t     | number            |                                    |
-| uint64_t    | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
-| uint64_t    | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
-| float       | number            |                                    |
-| double      | number            |                                    |
-| std::string | string            |                                    |
-| std::vector | Array             |                                    |
+| c++           | js                | REFERENCE                          |
+| ------------: | ----------------: | ---------------------------------: |
+| bool          | boolean           |                                    |
+| uint8_t       | number            |                                    |
+| int8_t        | number            |                                    |
+| uint16_t      | number            |                                    |
+| int16_t       | number            |                                    |
+| uint32_t      | number            |                                    |
+| int32_t       | number            |                                    |
+| uint64_t      | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| uint64_t      | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| float         | number            |                                    |
+| double        | number            |                                    |
+| std::string   | string            |                                    |
+| std::vector   | Array             |                                    |
+| std::function | function          |                                    |
 
 ### Custom Conversion
 
@@ -338,32 +339,32 @@ class PointJs : public Napi::ObjectWrap<PointJs> {
 
 namespace node_binding {
 
-template <>
-class TypeConvertor<Point> {
- public:
-  static Point ToNativeValue(const Napi::Value& value) {
-    Napi::Object obj = value.As<Napi::Object>();
+  template <>
+  class TypeConvertor<Point> {
+   public:
+    static Point ToNativeValue(const Napi::Value& value) {
+      Napi::Object obj = value.As<Napi::Object>();
 
-    return {
-        TypeConvertor<int>::ToNativeValue(obj["x"]),
-        TypeConvertor<int>::ToNativeValue(obj["y"]),
-    };
-  }
+      return {
+          TypeConvertor<int>::ToNativeValue(obj["x"]),
+          TypeConvertor<int>::ToNativeValue(obj["y"]),
+      };
+    }
 
-  static bool IsConvertible(const Napi::Value& value) {
-    if (!value.IsObject()) return false;
+    static bool IsConvertible(const Napi::Value& value) {
+      if (!value.IsObject()) return false;
 
-    Napi::Object obj = value.As<Napi::Object>();
+      Napi::Object obj = value.As<Napi::Object>();
 
-    return TypeConvertor<int>::IsConvertible(obj["x"]) &&
-           TypeConvertor<int>::IsConvertible(obj["y"]);
-  }
+      return TypeConvertor<int>::IsConvertible(obj["x"]) &&
+             TypeConvertor<int>::IsConvertible(obj["y"]);
+    }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
-                               const Point& value) {
-    return PointJs::New(info.Env(), value);
-  }
-};
+    static Napi::Value ToJSValue(const Napi::Env& env,
+                                 const Point& value) {
+      return PointJs::New(env, value);
+    }
+  };
 
 }  // namespace node_binding
 ```
@@ -422,11 +423,11 @@ void RectJs::SetBottomRight(const Napi::CallbackInfo& info,
 }
 
 Napi::Value RectJs::GetTopLeft(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, rect_.top_left);
+  return ToJSValue(info.Env(), rect_.top_left);
 }
 
 Napi::Value RectJs::GetBottomRight(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, rect_.bottom_right);
+  return ToJSValue(info.Env(), rect_.bottom_right);
 }
 ```
 

@@ -5,11 +5,41 @@
 #ifndef NODE_BINDING_STL_H_
 #define NODE_BINDING_STL_H_
 
+#include <functional>
 #include <vector>
 
 #include "node_binding/type_convertor.h"
 
 namespace node_binding {
+
+template <std::size_t... I, class _Tuple>
+Napi::Value Invoke(Napi::Function func, std::index_sequence<I...>,
+                   _Tuple&& tup) {
+  return func.Call({{ToJSValue<decltype(std::get<I>(tup))>(
+      func.Env(), std::get<I>(tup))...}});
+}
+
+template <typename R, typename... Args>
+class TypeConvertor<std::function<R(Args...)>> {
+ public:
+  static std::function<R(Args...)> ToNativeValue(const Napi::Value& value) {
+    Napi::Function f = value.As<Napi::Function>();
+    return [f](Args... args) -> R {
+      return TypeConvertor<R>::ToNativeValue(
+          Invoke(f, std::make_index_sequence<sizeof...(Args)>{},
+                 std::forward_as_tuple(args...)));
+    };
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsFunction();
+  }
+
+  static Napi::Value ToJSValue(const Napi::Env& env,
+                               const std::function<R(Args...)>& value) {
+    return Napi::Function::New(env, value);
+  }
+};
 
 template <typename T>
 class TypeConvertor<std::vector<T>> {
@@ -33,11 +63,11 @@ class TypeConvertor<std::vector<T>> {
     return true;
   }
 
-  static Napi::Value ToJSValue(const Napi::CallbackInfo& info,
+  static Napi::Value ToJSValue(const Napi::Env& env,
                                const std::vector<T>& value) {
-    Napi::Array ret = Napi::Array::New(info.Env(), value.size());
+    Napi::Array ret = Napi::Array::New(env, value.size());
     for (size_t i = 0; i < value.size(); ++i) {
-      ret[i] = TypeConvertor<T>::ToJSValue(info, value[i]);
+      ret[i] = TypeConvertor<T>::ToJSValue(env, value[i]);
     }
     return ret;
   }

@@ -55,13 +55,13 @@ void RectJs::SetBottomRight(const Napi::CallbackInfo& info,
 }
 
 Napi::Value RectJs::GetTopLeft(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, rect_.top_left);
+  return ToJSValue(info.Env(), rect_.top_left);
 }
 
 Napi::Value RectJs::GetBottomRight(const Napi::CallbackInfo& info) {
-  return ToJSValue(info, rect_.bottom_right);
+  return ToJSValue(info.Env(), rect_.bottom_right);
 }
 
 Napi::Value RectJs::Area(const Napi::CallbackInfo& info) {
-  return TypedCall(info, &Rect::Area, &rect_);
+  return TypedCall(info.Env(), &Rect::Area, &rect_);
 }
