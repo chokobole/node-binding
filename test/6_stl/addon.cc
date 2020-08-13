@@ -168,7 +168,7 @@ void callbackTest(std::string data,
                   int count,
                   int delay,
                   std::function<void(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     callback(data, count--);
@@ -179,7 +179,7 @@ void callbackTest2(std::string data,
                    int count,
                    int delay,
                    std::function<bool(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     if (!callback(data, count--))
@@ -255,7 +255,7 @@ void promiseCallbackTest(
     int count,
     int delay,
     node_binding::thread_safe_function<void(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     callback(data, count--);
@@ -267,7 +267,7 @@ std::string promiseCallbackTest2(
     int count,
     int delay,
     node_binding::thread_safe_function<bool(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     if (!callback(data, count--)) {
@@ -284,7 +284,7 @@ void cancellablePromiseCallbackTest(
     int count,
     int delay,
     node_binding::thread_safe_function<void(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     callback(data, count--);
@@ -296,7 +296,7 @@ std::string cancellablePromiseCallbackTest2(
     int count,
     int delay,
     node_binding::thread_safe_function<bool(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     delay_operation(data, delay);
     if (!callback(data, count--)) {
@@ -314,7 +314,7 @@ void cancellablePromiseCallbackTestWithCancelContext(
     int count,
     int delay,
     node_binding::thread_safe_function<void(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     if (ctx->canceled())
       return;
@@ -329,7 +329,7 @@ std::string cancellablePromiseCallbackTestWithCancelContext2(
     int count,
     int delay,
     node_binding::thread_safe_function<bool(std::string, int)> callback) {
-  data.append(" - " __FUNCTION__);
+  data.append(" - ").append(__FUNCTION__);
   while (count) {
     if (ctx->canceled()) {
       return std::string("canceled at ")
