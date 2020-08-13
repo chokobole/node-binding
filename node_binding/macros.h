@@ -18,9 +18,9 @@
   if (info.Length() != num_args) THROW_JS_WRONG_NUMBER_OF_ARGUMENTS(info.Env())
 
 #ifdef NAPI_CPP_EXCEPTIONS
-#define RETURN_IF_HAS_PENDING_EXCEPTION(env)
-#define RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env)
-#define RETURN_NULL_IF_HAS_PENDING_EXCEPTION(env)
+#define RETURN_IF_HAS_PENDING_EXCEPTION(env)  ((void)(env))
+#define RETURN_UNDEFINED_IF_HAS_PENDING_EXCEPTION(env)  ((void)(env))
+#define RETURN_NULL_IF_HAS_PENDING_EXCEPTION(env) ((void)(env))
 #else
 #define RETURN_IF_HAS_PENDING_EXCEPTION(env) \
   if (env.IsExceptionPending()) return

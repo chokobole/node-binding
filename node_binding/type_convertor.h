@@ -5,6 +5,7 @@
 #ifndef NODE_BINDING_TYPE_CONVERTOR_H_
 #define NODE_BINDING_TYPE_CONVERTOR_H_
 
+#include <string>
 #include <type_traits>
 
 #include "napi.h"
@@ -185,6 +186,51 @@ class TypeConvertor<T, std::enable_if_t<std::is_enum<T>::value>> {
   static Napi::Value ToJSValue(const Napi::Env& env, T value) {
     return Napi::Number::New(env,
                              static_cast<std::underlying_type_t<T>>(value));
+  }
+};
+
+template <typename T>
+class TypeConvertor<T, std::enable_if_t<std::is_same<const char*, T>::value>> {
+ public:
+  static std::string ToNativeValue(const Napi::Value& value) {
+    return value.As<Napi::String>().Utf8Value();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsString();
+  }
+
+  static Napi::Value ToJSValue(const Napi::Env& env, const char* value) {
+    return Napi::String::New(env, value);
+  }
+};
+
+template <>
+class TypeConvertor<Napi::Object> {
+ public:
+  static Napi::Object ToNativeValue(const Napi::Value& value) {
+    return value.ToObject();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsObject();
+  }
+
+  static Napi::Value ToJSValue(const Napi::Env& env,
+                               const Napi::Object& value) {
+    return value;
+  }
+};
+
+template <>
+class TypeConvertor<Napi::Value> {
+ public:
+  static Napi::Value ToNativeValue(const Napi::Value& value) { return value; }
+
+  static bool IsConvertible(const Napi::Value& value) { return true; }
+
+  static Napi::Value ToJSValue(const Napi::Env& env, const Napi::Value& value) {
+    return value;
   }
 };
 
