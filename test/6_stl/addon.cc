@@ -346,9 +346,6 @@ std::string cancellablePromiseCallbackTestWithCancelContext2(
   return "completed";
 }
 #endif
-// #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 1
-// #error 11
-// #endif
 
 #define FN_ENTRY(_env_, _functionName_) \
 #_functionName_, ::node_binding::ToJSValue((_env_), _functionName_)
