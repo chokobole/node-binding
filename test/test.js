@@ -358,10 +358,7 @@ describe('6_stl', () => {
             for (let index = 0; index < promise_test_repeat_count; ++index) {
               let ret = test6.cancellablePromiseCallbackTest(
                 callback_data, count, delay, (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을 throw하게
-                  // 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str,
@@ -401,10 +398,7 @@ describe('6_stl', () => {
             for (let index = 0; index < promise_test_repeat_count; ++index) {
               let ret = test6.cancellablePromiseCallbackTest2(
                 callback_data, count, delay, (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을 throw하게
-                  // 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str,
@@ -457,10 +451,7 @@ describe('6_stl', () => {
             for (let index = 0; index < promise_test_repeat_count; ++index) {
               let ret = test6.cancellablePromiseCallbackTestWithCancelContext(
                 callback_data, count, delay, (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을 throw하게
-                  // 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str,
@@ -500,10 +491,7 @@ describe('6_stl', () => {
             for (let index = 0; index < promise_test_repeat_count; ++index) {
               let ret = test6.cancellablePromiseCallbackTestWithCancelContext2(
                 callback_data, count, delay, (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을 throw하게
-                  // 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str,
