@@ -72,15 +72,20 @@ static Napi::Value ToPromise(const Napi::Env& env, void (*f)(Args...)) {
         node_binding::TypedCall(
             info, std::function<void(Args...)>([tsfn, deferred,
                                                 f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 new internal::async_worker(
                     deferred.Env(), [tsfn, deferred, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         f(args...);
                         tsfn.BlockingCall(
                             [deferred](Napi::Env env, Napi::Function) {
                               deferred.Resolve(env.Undefined());
                             });
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -92,8 +97,10 @@ static Napi::Value ToPromise(const Napi::Env& env, void (*f)(Args...)) {
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -106,6 +113,7 @@ static Napi::Value ToPromise(const Napi::Env& env, void (*f)(Args...)) {
                     });
                 tsfn.Release();
               }
+#endif
             }));
         return deferred.Promise();
       });
@@ -131,15 +139,20 @@ static Napi::Value ToPromise(const Napi::Env& env, R (*f)(Args...)) {
         node_binding::TypedCall(
             info, std::function<void(Args...)>([deferred, tsfn,
                                                 f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 new internal::async_worker(
                     deferred.Env(), [deferred, tsfn, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         R ret = f(args...);
                         tsfn.BlockingCall([ret, deferred](Napi::Env env,
                                                           Napi::Function) {
                           deferred.Resolve(node_binding::ToJSValue(env, ret));
                         });
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -151,8 +164,10 @@ static Napi::Value ToPromise(const Napi::Env& env, R (*f)(Args...)) {
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -165,6 +180,7 @@ static Napi::Value ToPromise(const Napi::Env& env, R (*f)(Args...)) {
                     });
                 tsfn.Release();
               }
+#endif
             }));
 
         return deferred.Promise();
@@ -205,15 +221,20 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env, R (*f)(Args...)) {
         node_binding::TypedCall(
             info, std::function<void(Args...)>([wk_destroyed, wk, deferred,
                                                 tsfn, f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Queue(
                     [deferred, tsfn, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         R ret = f(args...);
                         tsfn.BlockingCall([ret, deferred](Napi::Env env,
                                                           Napi::Function) {
                           deferred.Resolve(node_binding::ToJSValue(env, ret));
                         });
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -225,9 +246,11 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env, R (*f)(Args...)) {
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     },
                     [wk_destroyed]() mutable { *wk_destroyed = true; });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -240,6 +263,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env, R (*f)(Args...)) {
                     });
                 tsfn.Release();
               }
+#endif
             }));
         Napi::Object object = Napi::Object::New(env);
         object.Set("promise", deferred.Promise());
@@ -249,7 +273,9 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env, R (*f)(Args...)) {
                                       wk](const Napi::CallbackInfo&) mutable {
               if (*wk_destroyed)
                 return;
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Cancel();
                 Napi::Env env = deferred.Env();
 #ifdef NAPI_DISABLE_CPP_EXCEPTIONS
@@ -262,8 +288,10 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env, R (*f)(Args...)) {
                 Napi::Object obj = Napi::Object::New(env);
                 obj.Set("status", Napi::String::New(env, "canceled"));
                 deferred.Reject(obj);
+#ifdef CXX_EXCEPTIONS
               } catch (Napi::Error&) {
               }
+#endif              
             }));
         return object;
       });
@@ -292,15 +320,20 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
         node_binding::TypedCall(
             info, std::function<void(Args...)>([wk_destroyed, wk, deferred,
                                                 tsfn, f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Queue(
                     [wk_destroyed, deferred, tsfn, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         f(args...);
                         tsfn.BlockingCall(
                             [deferred](Napi::Env env, Napi::Function) {
                               deferred.Resolve(env.Undefined());
                             });
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -312,9 +345,11 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     },
                     [wk_destroyed]() mutable { *wk_destroyed = true; });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -327,6 +362,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                     });
                 tsfn.Release();
               }
+#endif
             }));
         Napi::Object object = Napi::Object::New(env);
         object.Set("promise", deferred.Promise());
@@ -336,7 +372,9 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                                       wk](const Napi::CallbackInfo&) mutable {
               if (*wk_destroyed)
                 return;
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Cancel();
                 Napi::Env env = deferred.Env();
 #ifdef NAPI_DISABLE_CPP_EXCEPTIONS
@@ -349,8 +387,10 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                 Napi::Object obj = Napi::Object::New(env);
                 obj.Set("status", Napi::String::New(env, "canceled"));
                 deferred.Reject(obj);
+#ifdef CXX_EXCEPTIONS
               } catch (Napi::Error&) {
               }
+#endif
             }));
         return object;
       });
@@ -384,10 +424,14 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
         node_binding::TypedCall(
             info, std::function<void(Args...)>([wk_destroyed, ctx, wk, deferred,
                                                 tsfn, f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Queue(
                     [ctx, deferred, tsfn, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         R ret = f(ctx, args...);
                         if (ctx->canceled()) {
                           tsfn.BlockingCall(
@@ -406,6 +450,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                             deferred.Resolve(node_binding::ToJSValue(env, ret));
                           });
                         }
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -417,9 +462,11 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     },
                     [wk_destroyed]() mutable { *wk_destroyed = true; });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -432,6 +479,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                     });
                 tsfn.Release();
               }
+#endif
             }));
         Napi::Object object = Napi::Object::New(env);
         object.Set("promise", deferred.Promise());
@@ -442,7 +490,9 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
               ctx->cancel();
               if (*wk_destroyed)
                 return;
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Cancel();
                 Napi::Env env = deferred.Env();
 #ifdef NAPI_DISABLE_CPP_EXCEPTIONS
@@ -455,8 +505,10 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                 Napi::Object obj = Napi::Object::New(env);
                 obj.Set("status", Napi::String::New(env, "canceled"));
                 deferred.Reject(obj);
+#ifdef CXX_EXCEPTIONS
               } catch (Napi::Error&) {
               }
+#endif
             }));
         return object;
       });
@@ -479,10 +531,14 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
         node_binding::TypedCall(
             info, std::function<void(Args...)>([wk_destroyed, ctx, wk, deferred,
                                                 tsfn, f](Args... args) mutable {
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Queue(
                     [wk_destroyed, ctx, deferred, tsfn, f, args...]() mutable {
+#ifdef CXX_EXCEPTIONS
                       try {
+#endif
                         f(ctx, args...);
                         if (ctx->canceled()) {
                           tsfn.BlockingCall(
@@ -499,6 +555,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                                 deferred.Resolve(env.Undefined());
                               });
                         }
+#ifdef CXX_EXCEPTIONS
                       } catch (const std::exception& e) {
                         std::string info = e.what();
                         tsfn.BlockingCall([info, deferred](Napi::Env env,
@@ -510,9 +567,11 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                           deferred.Reject(obj);
                         });
                       }
+#endif
                       tsfn.Release();
                     },
                     [wk_destroyed]() mutable { *wk_destroyed = true; });
+#ifdef CXX_EXCEPTIONS
               } catch (const std::exception& e) {
                 std::string info = e.what();
                 tsfn.BlockingCall(
@@ -525,6 +584,7 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                     });
                 tsfn.Release();
               }
+#endif
             }));
         Napi::Object object = Napi::Object::New(env);
         object.Set("promise", deferred.Promise());
@@ -535,7 +595,9 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
               ctx->cancel();
               if (*wk_destroyed)
                 return;
+#ifdef CXX_EXCEPTIONS
               try {
+#endif
                 wk->Cancel();
                 Napi::Env env = deferred.Env();
 #ifdef NAPI_DISABLE_CPP_EXCEPTIONS
@@ -548,8 +610,10 @@ static Napi::Value ToCancellablePromise(const Napi::Env& env,
                 Napi::Object obj = Napi::Object::New(env);
                 obj.Set("status", Napi::String::New(env, "canceled"));
                 deferred.Reject(obj);
+#ifdef CXX_EXCEPTIONS
               } catch (Napi::Error&) {
               }
+#endif
             }));
         return object;
       });

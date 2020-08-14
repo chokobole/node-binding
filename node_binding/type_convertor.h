@@ -124,6 +124,38 @@ class TypeConvertor<T, std::enable_if_t<std::is_same<uint64_t, T>::value>> {
   }
 };
 
+template <>
+class TypeConvertor<long> {
+ public:
+  static long ToNativeValue(const Napi::Value& value) {
+    return value.As<Napi::Number>().Int64Value();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
+  }
+
+  static Napi::Value ToJSValue(const Napi::Env& env, long value) {
+    return Napi::Number::New(env, value);
+  }
+};
+
+template <>
+class TypeConvertor<unsigned long> {
+ public:
+  static unsigned long ToNativeValue(const Napi::Value& value) {
+    return value.As<Napi::Number>().Int64Value();
+  }
+
+  static bool IsConvertible(const Napi::Value& value) {
+    return value.IsNumber();
+  }
+
+  static Napi::Value ToJSValue(const Napi::Env& env, unsigned long value) {
+    return Napi::Number::New(env, value);
+  }
+};
+
 template <typename T>
 class TypeConvertor<T, std::enable_if_t<std::is_same<float, T>::value>> {
  public:

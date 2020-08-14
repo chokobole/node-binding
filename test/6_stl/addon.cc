@@ -51,14 +51,26 @@ object getObject(const std::string value) {
        {value + "_double_array", std::vector<double>({1.2, 3.4, 5.6, 7.8})},
        {value + "_fn_array",
         std::vector<node_binding::function>(
+#if defined(__clang__)
+            {node_binding::function::from<std::string(std::string)>([](std::string arg0) {
+#else
             {node_binding::function::from([](std::string arg0) {
+#endif
                return std::string("called (fn[0]) : ") + arg0;
              }),
+#if defined(__clang__)
+             node_binding::function::from<std::string(std::string)>([](std::string arg0) {
+#else
              node_binding::function::from([](std::string arg0) {
+#endif
                return std::string("called (fn[1]) : ") + arg0;
              })})},
        {"callback",
+#if defined(__clang__)
+        node_binding::function::from<object(int, std::string)>([](int arg0, std::string arg1) -> object {
+#else
         node_binding::function::from([](int arg0, std::string arg1) -> object {
+#endif          
           return object({{"arg0", arg0}, {"arg1", arg1}});
         })}});
 
@@ -208,12 +220,14 @@ std::string beginMoveTsfnCallbackTest(
 
     callbackThread_ = std::thread([data]() {
       callbackThread_.detach();
+#ifdef CXX_EXCEPTIONS
       try {
         callback_ = callback2_;  // Copying objects without tsfn is not allowed.
       } catch (std::exception& e) {
         std::cerr << "[C++ exception] " << data << " " << e.what() << "\n"
                   << std::endl;
       }
+#endif
       callback2_ = callback_;  // Move a tsfn object and copy a function object.
       callback_ = callback2_;  // No change
 
@@ -360,7 +374,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("sum", Napi::Function::New(env, Sum));
   exports.Set("linSpace", Napi::Function::New(env, LinSpace));
 
-#if CXX_VER >= 201703
+#ifdef _NODE_BINDING_OBJECT
   exports.Set(FN_ENTRY(env, getName));
   // exports.Set(FN_ENTRY(env, setName));   // Not yet supported
   exports.Set(FN_ENTRY(env, getObject));

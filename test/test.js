@@ -253,9 +253,7 @@ describe('6_stl', () => {
   describe('std::function<?> bind', () => {
     it('std::function<void(std::string, int)>', () => {
       test6.callbackTest(callback_data, count, delay, (str, num) => {
-        // throw 111 // <-- object나 function아닌 내용을 throw하게 되면,
-        // node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시
-        // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+        // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
         assert.equal(str, callback_data + ' - callbackTest');
         assert.ok(num <= count);
         assert.ok(num >= 0);
@@ -264,9 +262,7 @@ describe('6_stl', () => {
 
     it('std::function<bool(std::string, int)>', () => {
       test6.callbackTest2(callback_data, count, delay, (str, num) => {
-        // throw 111 // <-- object나 function아닌 내용을 throw하게 되면,
-        // node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시
-        // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+        // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
         assert.equal(str, callback_data + ' - callbackTest2');
         assert.ok(num <= count);
         assert.ok(num >= stopIndex);
@@ -286,11 +282,7 @@ describe('6_stl', () => {
               .promiseCallbackTest(
                 callback_data, count, delay,
                 (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을
-                  // throw하게 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류
-                  // 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str,
@@ -319,10 +311,7 @@ describe('6_stl', () => {
               .promiseCallbackTest2(
                 callback_data, count, delay,
                 (str, num) => {
-                  // throw 111 // <-- object나 function아닌 내용을
-                  // throw하게 되면, node_binding/typed_call.h의
-                  // __USE_FUNCTION_CALL_METHOD__ 활성화 시
-                  // Napi::Error::Fatal메서드가 호출되어 오류 발생함.
+                  // throw 111 /* <-- object나 function아닌 내용을 throw하게 되면, node_binding/typed_call.h의 __USE_FUNCTION_CALL_METHOD__ 활성화 시 Napi::Error::Fatal메서드가 호출되어 오류 발생함.*/
                   try {
                     assert.equal(
                       str, callback_data + ' - promiseCallbackTest2');

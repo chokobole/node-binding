@@ -11,26 +11,21 @@
 #define CXX_VER __cplusplus
 #endif
 
+#ifdef __cpp_exceptions
+#define CXX_EXCEPTIONS
+#endif
+
 #if defined(__clang__)
 #if __has_feature(cxx_rtti)
 #define CXX_RTTI
-#endif
-#ifdef __cpp_exceptions
-#define CXX_EXCEPTIONS
 #endif
 #elif defined(__GNUG__)
 #if defined(__GXX_RTTI)
 #define CXX_RTTI
 #endif
-#ifdef __cpp_exceptions
-#define CXX_EXCEPTIONS
-#endif
 #elif defined(_MSC_VER)
 #if defined(_CPPRTTI)
 #define CXX_RTTI
-#endif
-#if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 1
-#define CXX_EXCEPTIONS
 #endif
 #endif
 
@@ -107,7 +102,7 @@ class TypeConvertor<std::vector<T>> {
 template <typename R, typename... Args>
 class TypeConvertor<R (*)(Args...)> {
  public:
-  static Napi::Value ToJSValue(const Napi::Env& env, R (&value)(Args...)) {
+  static Napi::Value ToJSValue(const Napi::Env& env, R (*value)(Args...)) {
     Napi::Function func = Napi::Function::New(
         env, [value](const Napi::CallbackInfo& info) -> Napi::Value {
           return node_binding::TypedCall(info, value);
@@ -119,7 +114,7 @@ class TypeConvertor<R (*)(Args...)> {
 template <typename... Args>
 class TypeConvertor<void (*)(Args...)> {
  public:
-  static Napi::Value ToJSValue(const Napi::Env& env, void (&value)(Args...)) {
+  static Napi::Value ToJSValue(const Napi::Env& env, void (*value)(Args...)) {
     Napi::Function func =
         Napi::Function::New(env, [value](const Napi::CallbackInfo& info) {
           node_binding::TypedCall(info, value);
@@ -143,8 +138,10 @@ class thread_safe_function : public std::function<Fty_> {
 
   thread_safe_function(const thread_safe_function& other)
       : T(*static_cast<const T*>(&other)) {
+#ifdef CXX_EXCEPTIONS
     if (!other.ptsfn_)
       throw std::runtime_error("invalid object");
+#endif
     ptsfn_ = std::move(other.ptsfn_);
   }
 
@@ -162,13 +159,17 @@ class thread_safe_function : public std::function<Fty_> {
 
     // 이미 tsfn을 소유한 객체인 경우, 예외를 전달합니다.
     if (ptsfn_) {
+#ifdef CXX_EXCEPTIONS
       throw std::runtime_error("already initialized");
+#endif
       return *this;
     }
 
     // tsfn를 소유하지 않은 객체를 대입 복사하는것을 차단합니다.
     if (!rhs.ptsfn_) {
+#ifdef CXX_EXCEPTIONS
       throw std::runtime_error("invalid object");
+      #endif
       return *this;
     }
 
@@ -498,19 +499,26 @@ class TypeConvertor<function> {
 using object = std::unordered_map<std::string, std::any>;
 template <typename T>
 T any_cast(std::any& _Any) {
+#if defined(CXX_EXCEPTIONS)
   try {
     Napi::Value value = std::any_cast<Napi::Value>(_Any);
-    if (!TypeConvertor<T>::IsConvertible(value))
-      return T();
-    return TypeConvertor<T>::ToNativeValue(value);
-  } catch (std::bad_any_cast&) {
+    if (TypeConvertor<T>::IsConvertible(value)) return TypeConvertor<T>::ToNativeValue(value);
+  } catch (...) {
     try {
       T value = std::any_cast<T>(_Any);
       return value;
-    } catch (std::bad_any_cast&) {
+    } catch (...) {
     }
-    return T();
   }
+#elif defined(CXX_RTTI) || defined(_MSC_VER)
+  if (typeid(Napi::Value) == _Any.type()) {
+    Napi::Value value = std::any_cast<Napi::Value>(_Any);
+    if (TypeConvertor<T>::IsConvertible(value)) return TypeConvertor<T>::ToNativeValue(value);
+  } else if (typeid(T) == _Any.type()) {
+    return std::any_cast<T>(_Any);
+  }
+#endif
+  return T();
 }
 
 /**
