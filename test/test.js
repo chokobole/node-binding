@@ -207,7 +207,7 @@ describe('6_stl', () => {
     });
   });
 
-  if (test6.napiVersion() > 3) {
+  if (test6.beginMoveTsfnCallbackTest && test6.endMoveTsfnCallbackTest) {
     // 오류가 발생하지 않으면 성공한것으로 판단하면 됩니다.
     describe('tsfn move test', () => {
       // promise가 오래 동작(5*100)하기때문에 native thread 보다 늦게 종료되는
@@ -272,10 +272,10 @@ describe('6_stl', () => {
     }).timeout(timeout);
   });
 
-  if (test6.napiVersion() > 3) {
-    describe(
-      'node_binding::ToPromise - node_binding::thread_safe_function<?> bind',
-      () => {
+  describe(
+    'node_binding::ToPromise - node_binding::thread_safe_function<?> bind',
+    () => {
+      if (test6.promiseCallbackTest) {
         it('node_binding::thread_safe_function<void(std::string, int)>',
           (done) => {
             test6
@@ -304,7 +304,9 @@ describe('6_stl', () => {
               })
           })
           .timeout(timeout);
+      }
 
+      if (test6.promiseCallbackTest2) {
         it('node_binding::thread_safe_function<bool(std::string, int)>',
           (done) => {
             test6
@@ -336,11 +338,13 @@ describe('6_stl', () => {
               });
           })
           .timeout(timeout);
-      });
+      }
+    });
 
-    describe(
-      'node_binding::ToCancellablePromise - node_binding::thread_safe_function<?> bind',
-      () => {
+  describe(
+    'node_binding::ToCancellablePromise - node_binding::thread_safe_function<?> bind',
+    () => {
+      if (test6.cancellablePromiseCallbackTest) {
         it('node_binding::thread_safe_function<void(std::string, int)>',
           (done) => {
             let jobs = new Map();
@@ -380,7 +384,8 @@ describe('6_stl', () => {
             }
           })
           .timeout(timeout);
-
+      }
+      if (test6.cancellablePromiseCallbackTest2) {
         it('node_binding::thread_safe_function<bool(std::string, int)>',
           (done) => {
             let jobs = new Map();
@@ -428,11 +433,13 @@ describe('6_stl', () => {
             }
           })
           .timeout(timeout)
-      });
+      }
+    });
 
-    describe(
-      'node_binding::ToCancellablePromise - node_binding::cancel_context_ptr and node_binding::thread_safe_function<?> bind',
-      () => {
+  describe(
+    'node_binding::ToCancellablePromise - node_binding::cancel_context_ptr and node_binding::thread_safe_function<?> bind',
+    () => {
+      if (test6.cancellablePromiseCallbackTestWithCancelContext) {
         it('node_binding::cancel_context_ptr and node_binding::thread_safe_function<void(std::string, int)>',
           (done) => {
             let jobs = new Map();
@@ -472,7 +479,9 @@ describe('6_stl', () => {
             }
           })
           .timeout(timeout);
+      }
 
+      if (test6.cancellablePromiseCallbackTestWithCancelContext2) {
         it('node_binding::cancel_context_ptr and node_binding::thread_safe_function<bool(std::string, int)>',
           (done) => {
             let jobs = new Map();
@@ -521,6 +530,6 @@ describe('6_stl', () => {
             }
           })
           .timeout(timeout)
-      });
-  }
+      }
+    });
 });

@@ -401,11 +401,6 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(PROMISE_FN_ENTRY(env, beginMoveTsfnCallbackTest));
   exports.Set(PROMISE_FN_ENTRY(env, endMoveTsfnCallbackTest));
 #endif
-
-  exports.Set("napiVersion",
-              ::node_binding::ToJSValue(
-                  env, std::function<uint32_t()>(
-                           []() -> uint32_t { return NAPI_VERSION; })));
   return exports;
 }
 
