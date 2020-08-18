@@ -63,5 +63,5 @@ Napi::Value RectJs::GetBottomRight(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value RectJs::Area(const Napi::CallbackInfo& info) {
-  return TypedCall(info.Env(), &Rect::Area, &rect_);
+  return TypedCall(info, &Rect::Area, &rect_);
 }
