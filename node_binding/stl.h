@@ -184,7 +184,7 @@ class thread_safe_function : public std::function<Fty_> {
     if (rhs.tsfn_mtx_) {
       tsfn_mtx_ = rhs.tsfn_mtx_;
     } else {
-      tsfn_mtx_ = std::make_shared<std::shared_mutex>();
+      tsfn_mtx_ = std::make_shared<std::shared_timed_mutex>();
       rhs.tsfn_mtx_ = tsfn_mtx_;
     }
     tsfn_mtx_->lock_shared();  // 참조를 증가시킵니다.
@@ -211,7 +211,7 @@ class thread_safe_function : public std::function<Fty_> {
 
  private:
   mutable std::unique_ptr<Napi::ThreadSafeFunction> ptsfn_;
-  mutable std::shared_ptr<std::shared_mutex> tsfn_mtx_;
+  mutable std::shared_ptr<std::shared_timed_mutex> tsfn_mtx_;
   mutable std::mutex copy_op_mtx_;
 };
 
