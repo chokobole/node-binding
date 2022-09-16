@@ -307,22 +307,27 @@ console.log(linSpace(1, 5, 1));  // [1, 2, 3, 4]
 
 ### Conversion
 
-| c++           | js                | REFERENCE                          |
+| C++           | JS                | REFERENCE                          |
 | ------------: | ----------------: | ---------------------------------: |
-| bool          | boolean           |                                    |
-| uint8_t       | number            |                                    |
-| int8_t        | number            |                                    |
-| uint16_t      | number            |                                    |
-| int16_t       | number            |                                    |
-| uint32_t      | number            |                                    |
-| int32_t       | number            |                                    |
-| uint64_t      | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
-| uint64_t      | number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
-| float         | number            |                                    |
-| double        | number            |                                    |
-| std::string   | string            |                                    |
+| bool          | Boolean           |                                    |
+| uint8_t       | Number            |                                    |
+| int8_t        | Number            |                                    |
+| uint16_t      | Number            |                                    |
+| int16_t       | Number            |                                    |
+| uint32_t      | Number            |                                    |
+| int32_t       | Number            |                                    |
+| uint64_t      | Number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| uint64_t      | Number or BigInt  | BigInt if NAPI_EXPERIMENTAL is on  |
+| float         | Number            |                                    |
+| double        | Number            |                                    |
+| std::string   | String            |                                    |
 | std::vector   | Array             |                                    |
-| std::function | function          |                                    |
+| std::function | Function          |                                    |
+| std::unordered_map<std::string, std::any> | Object          |   C++17 or later  |
+| node_binding::function | Function | |
+| node_binding::async_function | Promise |
+| node_binding::cancellable_async_function | { promise: Promise, cancel : Function } : Object  |
+| node_binding::object | Object          |   C++17 or later  |
 
 ### Custom Conversion
 
