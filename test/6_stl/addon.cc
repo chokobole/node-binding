@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "node_binding/promise.h"
 #include "node_binding/stl.h"
-#include "node_binding/typed_call.h"
 
 int CSum(const std::vector<int>& vec) {
   int ret = 0;

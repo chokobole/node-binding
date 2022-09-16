@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "node_binding/stl.h"
+
 #ifndef NODE_BINDING_OBJECT_H_
 #define NODE_BINDING_OBJECT_H_
-
-#include "node_binding/stl.h"
 
 #if CXX_VER >= 201703
 #include <any>

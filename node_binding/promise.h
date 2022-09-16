@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "node_binding/stl.h"
+
 #ifndef NODE_BINDING_PROMISE_H_
 #define NODE_BINDING_PROMISE_H_
 
 #include <atomic>
 #include <functional>
 #include <string>
-
-#include "node_binding/stl.h"
 
 namespace node_binding {
 /**
